@@ -1,0 +1,35 @@
+{
+  "name": "kizunama",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "data:kanji": "node scripts/build-kanji-index.mjs",
+    "build:icons": "node scripts/build-icons.mjs"
+  },
+  "dependencies": {
+    "any-ascii": "^0.3.3",
+    "phonemizer": "^1.2.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "wanakana": "^5.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "jsdom": "^29.1.1",
+    "kanjidic2-json": "^0.1.0",
+    "oxlint": "^1.71.0",
+    "sharp": "^0.35.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1",
+    "vitest": "^4.1.10"
+  }
+}

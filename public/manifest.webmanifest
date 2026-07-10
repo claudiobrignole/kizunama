@@ -1,0 +1,16 @@
+{
+  "name": "絆名 | Kizunama — Discover your Japanese Kanji name",
+  "short_name": "Kizunama",
+  "description": "Pick meaningful traits, get real Kanji, and create a shareable Hanko seal. Free, no AI, no account.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#faf6ed",
+  "theme_color": "#a8203a",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
