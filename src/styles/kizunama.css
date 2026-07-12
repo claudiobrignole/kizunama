@@ -1,0 +1,1195 @@
+/* Kizunama — app layout on top of Luna Nihongo DS */
+
+:root {
+  --page-max-width: 720px;
+  --kz-tool-max-width: 640px;
+  --text-muted: var(--ln-ink);
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.kz-landing {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header / brand */
+.kz-landing .ln-header {
+  background: var(--ln-ink);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--ln-cream);
+}
+
+.kz-header-logo {
+  height: 2.15rem;
+  width: auto;
+  display: block;
+}
+
+.kz-landing .ln-header-inner {
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.kz-header-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.kz-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+}
+
+.kz-help-btn {
+  min-height: 2.4rem;
+  height: 2.4rem;
+  font-size: 0.78rem;
+  padding: 0 0.85rem;
+}
+
+.kz-landing .ln-header .kz-help-btn {
+  background: #fff;
+  color: var(--ln-ink);
+  border-color: #fff;
+  box-shadow: 4px 4px 0 rgba(255, 255, 255, 0.28);
+}
+
+.kz-landing .ln-header .kz-help-btn:hover {
+  box-shadow: 6px 6px 0 rgba(255, 255, 255, 0.34);
+}
+
+.kz-landing .ln-header .kz-help-btn:active {
+  box-shadow: 2px 2px 0 rgba(255, 255, 255, 0.28);
+}
+
+/* Header lang = negative of adjacent white help button */
+.kz-landing .ln-header .kz-lang-switcher__btn {
+  background: transparent;
+  color: #fff;
+  border-color: #fff;
+  box-shadow: 4px 4px 0 rgba(255, 255, 255, 0.22);
+}
+
+.kz-landing .ln-header .kz-lang-switcher__btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: 6px 6px 0 rgba(255, 255, 255, 0.28);
+}
+
+.kz-landing .ln-header .kz-lang-switcher__btn:active {
+  box-shadow: 2px 2px 0 rgba(255, 255, 255, 0.22);
+}
+
+.kz-help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-left: 0.4rem;
+  border: 2px solid var(--ln-ink);
+  border-radius: 999px;
+  background: #fff;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.72rem;
+  line-height: 1;
+  color: var(--ln-ink);
+  cursor: pointer;
+  vertical-align: middle;
+  box-shadow: 2px 2px 0 var(--ln-shadow);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.kz-help-icon:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--ln-shadow);
+}
+
+.kz-help-icon:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Language switcher — same mg-btn footprint as help; custom menu */
+.kz-lang-switcher {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+}
+
+.kz-lang-switcher__btn {
+  gap: 0.35rem;
+  letter-spacing: 0.04em;
+}
+
+.kz-lang-switcher__chevron {
+  flex-shrink: 0;
+  display: block;
+  transition: transform var(--transition-fast);
+}
+
+.kz-lang-switcher.is-open .kz-lang-switcher__chevron {
+  transform: rotate(180deg);
+}
+
+/* Footer lang = negative of adjacent white help button */
+.kz-footer .kz-lang-switcher__btn {
+  background: var(--ln-ink);
+  color: var(--ln-cream);
+  border-color: var(--ln-ink);
+}
+
+.kz-footer .kz-lang-switcher__btn:hover {
+  color: var(--ln-cream);
+}
+
+.kz-lang-switcher__menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 40;
+  min-width: 11.5rem;
+  margin: 0;
+  padding: 0.4rem;
+  list-style: none;
+  background: #fff;
+  color: var(--ln-ink);
+  border: 2px solid var(--ln-ink);
+  border-radius: 14px;
+  box-shadow: 4px 4px 0 var(--ln-shadow);
+}
+
+.kz-lang-switcher--footer .kz-lang-switcher__menu {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.kz-lang-switcher__option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ln-ink);
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: left;
+  cursor: pointer;
+}
+
+.kz-lang-switcher__option:hover,
+.kz-lang-switcher__option:focus-visible {
+  background: var(--ln-cream);
+  outline: none;
+}
+
+.kz-lang-switcher__option.is-selected {
+  background: var(--ln-ink);
+  color: #fff;
+}
+
+.kz-lang-switcher__option-code {
+  letter-spacing: 0.04em;
+}
+
+.kz-lang-switcher__option-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.78;
+}
+
+.kz-lang-switcher__option.is-selected .kz-lang-switcher__option-name {
+  opacity: 0.9;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Language banner (first-visit browser-language prompt) */
+.kz-lang-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  background: var(--ln-yellow);
+  color: var(--ln-ink);
+  border-bottom: var(--border-band-top);
+  z-index: 110;
+  font-size: calc(0.84rem / var(--ln-body-text-scale));
+  font-weight: 600;
+}
+
+.kz-lang-banner__actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.kz-lang-banner .mg-btn {
+  min-height: 2.2rem;
+  height: 2.2rem;
+  font-size: 0.76rem;
+}
+
+/* Help dialog */
+.kz-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 200;
+}
+
+.kz-help-dialog {
+  max-width: 480px;
+  width: 100%;
+  max-height: min(80vh, 560px);
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+.kz-help-dialog__title {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 1.2rem;
+  margin: 0 0 0.9rem;
+  color: var(--ln-ink);
+}
+
+.kz-help-dialog__list {
+  margin: 0 0 1.25rem;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  font-size: calc(0.88rem / var(--ln-body-text-scale));
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.kz-help-dialog__close {
+  width: 100%;
+}
+
+.kz-footer-logo {
+  display: inline-block;
+  line-height: 0;
+  transition: transform var(--transition-fast);
+}
+
+.kz-footer-logo:hover {
+  transform: translate(-1px, -1px);
+}
+
+.kz-footer-logo:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.kz-brand-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+
+.kz-brand-lockup__name {
+  font-family: var(--font-heading);
+  font-size: calc(1.35rem / var(--ln-body-text-scale));
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--ln-cream);
+  letter-spacing: 0.02em;
+}
+
+.kz-brand-lockup__kanji {
+  color: var(--ln-red);
+  font-size: 1.3em;
+  font-family: var(--font-japanese);
+  font-weight: 900;
+  margin-right: 0.15em;
+}
+
+.kz-header-tagline {
+  margin: 0;
+  font-size: calc(0.78rem / var(--ln-body-text-scale));
+  font-weight: 500;
+  line-height: 1.15;
+  color: rgba(250, 246, 237, 0.7);
+  white-space: pre-line;
+}
+
+/* Band 02 (ateji) keeps the cream previously used on band 01 */
+.kz-landing .mg-band--washi {
+  background: var(--ln-cream);
+}
+
+/* Compact tool bands (override marketing min-heights) */
+.kz-band .mg-band-inner {
+  min-height: 0;
+  padding-top: 2rem;
+  padding-bottom: 2.25rem;
+}
+
+.kz-band .mg-band-copy {
+  max-width: min(100%, var(--kz-tool-max-width));
+  width: 100%;
+  margin-inline: auto;
+}
+
+.kz-band-sub {
+  margin: 0 0 1rem;
+  font-size: calc(0.92rem / var(--ln-body-text-scale));
+  font-weight: 500;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.mg-band--purple .kz-band-sub,
+.mg-band--ink .kz-band-sub,
+.mg-band--red .kz-band-sub {
+  color: #fff;
+}
+
+/* In-band tool card */
+.kz-tool-card {
+  margin-top: 0.25rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.kz-filter-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-light);
+  margin: 0 0 0.55rem;
+}
+
+.kz-empty-hint {
+  margin: 0;
+  color: var(--text-light);
+  font-size: calc(0.84rem / var(--ln-body-text-scale));
+  text-align: center;
+  padding: 0.75rem 0;
+}
+
+.kz-section-gap {
+  margin-top: 1rem;
+}
+
+/* Hanko */
+.kz-hanko-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 1.15rem;
+  padding-top: 1.15rem;
+  border-top: var(--border-hairline);
+}
+
+.kz-hanko-preview {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kz-hanko-svg-wrap {
+  width: 148px;
+  height: 148px;
+  flex-shrink: 0;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.kz-hanko-svg-wrap svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.kz-hanko-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.15rem;
+}
+
+.kz-action-row {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Order helper */
+.kz-order-helper {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: var(--border-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.kz-order-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-card);
+  border: 2px solid var(--ln-ink);
+  background: var(--ln-red-a08);
+  font-size: calc(0.8rem / var(--ln-body-text-scale));
+  box-shadow: 3px 3px 0 var(--ln-card-shadow);
+}
+
+.kz-order-field__label {
+  color: var(--text-muted);
+  font-size: calc(0.66rem / var(--ln-body-text-scale));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.kz-order-field__value {
+  font-weight: 600;
+  font-family: var(--font-japanese);
+}
+
+.kz-copy-btn {
+  border: none;
+  background: transparent;
+  color: var(--ln-red-deep);
+  font-family: var(--font-body);
+  font-size: calc(0.74rem / var(--ln-body-text-scale));
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.kz-copy-btn:hover {
+  color: var(--ln-red);
+}
+
+.kz-copy-btn:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Katakana row */
+.kz-name-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.kz-name-row--no-lang {
+  grid-template-columns: 1fr auto;
+}
+
+.kz-name-row .lnx-input {
+  min-width: 0;
+  width: 100%;
+}
+
+.kz-katakana-result {
+  margin-top: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.kz-katakana-result__text {
+  font-family: var(--font-japanese);
+  font-size: calc(1.55rem / var(--ln-body-text-scale));
+  font-weight: 700;
+}
+
+.kz-loading-note {
+  font-size: calc(0.74rem / var(--ln-body-text-scale));
+  color: var(--text-light);
+  margin: 0.45rem 0 0;
+}
+
+.kz-field-block {
+  margin-top: 0.85rem;
+}
+
+.kz-surname-block {
+  margin-top: 1.75rem;
+}
+
+.kz-surname-block > .mg-index {
+  display: block;
+  text-transform: uppercase;
+}
+
+.kz-surname-hint {
+  margin: 0.35rem 0 0.75rem;
+}
+
+/* Credibility badge */
+.kz-credibility-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  border: 2px solid var(--ln-ink);
+  font-size: calc(0.68rem / var(--ln-body-text-scale));
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 3px 3px 0 var(--ln-shadow);
+}
+
+.kz-credibility-badge--high {
+  background: #d8f3e4;
+  color: hsl(150, 60%, 22%);
+  border-color: hsl(150, 60%, 30%);
+}
+
+.kz-credibility-badge--medium {
+  background: #fff4d6;
+  color: var(--ln-ink);
+  border-color: var(--ln-ink);
+}
+
+.kz-credibility-badge--low {
+  background: #fde8ec;
+  color: var(--ln-red-deep);
+  border-color: var(--ln-red-deep);
+}
+
+/* Ateji band */
+.kz-ateji-block {
+  margin-top: 0.9rem;
+}
+
+.kz-ateji-block + .kz-ateji-block {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: var(--border-hairline);
+}
+
+.kz-ateji-block__heading {
+  font-family: var(--font-heading);
+  font-size: calc(0.82rem / var(--ln-body-text-scale));
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0 0 0.6rem;
+}
+
+.kz-ateji-combo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.kz-ateji-combo-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.55rem 0.9rem;
+  border: 2px solid var(--ln-ink);
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: 3px 3px 0 var(--ln-shadow);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.kz-ateji-combo-chip:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ln-shadow);
+}
+
+.kz-ateji-combo-chip:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.kz-ateji-combo-chip--chosen {
+  border-color: var(--ln-red);
+  background: var(--primary-glow);
+  box-shadow: 4px 4px 0 rgba(var(--ln-red-rgb), 0.35);
+}
+
+.kz-ateji-combo-chip__text {
+  font-family: var(--font-japanese);
+  font-size: calc(1.2rem / var(--ln-body-text-scale));
+  font-weight: 700;
+  color: var(--ln-ink);
+}
+
+.kz-ateji-combo-chip__label {
+  font-size: calc(0.62rem / var(--ln-body-text-scale));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ln-red-deep);
+}
+
+.kz-ateji-slot-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.kz-ateji-slot {
+  position: relative;
+  flex: 1 1 6.5rem;
+  min-width: 6.5rem;
+  padding: 0.75rem 0.6rem;
+  border: 2px solid var(--ln-ink);
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: 3px 3px 0 var(--ln-shadow);
+  text-align: center;
+}
+
+.kz-ateji-slot--unmatched {
+  background: var(--ln-red-a08);
+  border-style: dashed;
+}
+
+.kz-ateji-slot__char {
+  font-family: var(--font-japanese);
+  font-size: calc(1.7rem / var(--ln-body-text-scale));
+  font-weight: 700;
+  color: var(--ln-ink);
+  line-height: 1.1;
+}
+
+.kz-ateji-slot__meta {
+  margin-top: 0.3rem;
+  font-size: calc(0.68rem / var(--ln-body-text-scale));
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.kz-ateji-slot__historical {
+  color: var(--ln-red-deep);
+}
+
+.kz-ateji-slot__meaning {
+  margin-top: 0.2rem;
+  font-size: calc(0.68rem / var(--ln-body-text-scale));
+  color: var(--text-light);
+}
+
+.kz-ateji-slot__swap {
+  display: inline-block;
+  margin-top: 0.4rem;
+}
+
+.kz-ateji-swap-panel {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 0.4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 15rem;
+  max-width: 80vw;
+  padding: 0.75rem;
+  border: 2px solid var(--ln-ink);
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: var(--shadow-panel);
+  text-align: left;
+}
+
+.kz-ateji-swap-panel__title {
+  margin: 0 0 0.5rem;
+  font-size: calc(0.7rem / var(--ln-body-text-scale));
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.kz-ateji-swap-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-height: 12rem;
+  overflow-y: auto;
+  margin-bottom: 0.5rem;
+}
+
+.kz-ateji-swap-option {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.kz-ateji-swap-option:hover {
+  background: var(--primary-glow);
+}
+
+.kz-ateji-swap-option:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.kz-ateji-swap-option__char {
+  font-family: var(--font-japanese);
+  font-size: calc(1.15rem / var(--ln-body-text-scale));
+  font-weight: 700;
+  color: var(--ln-ink);
+}
+
+.kz-ateji-swap-option__meta {
+  font-size: calc(0.66rem / var(--ln-body-text-scale));
+  color: var(--text-muted);
+}
+
+.kz-ateji-unmatched-note {
+  margin: 0.7rem 0 0;
+  font-size: calc(0.74rem / var(--ln-body-text-scale));
+  color: var(--text-light);
+}
+
+/* Seimei handan band */
+.kz-seimei-block {
+  margin-top: 0.9rem;
+}
+
+.kz-seimei-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.kz-seimei-pillar {
+  padding: 0.85rem 0.9rem;
+  border: 2px solid var(--ln-ink);
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: 3px 3px 0 var(--ln-shadow);
+}
+
+.kz-seimei-pillar--daikichi,
+.kz-seimei-pillar--kichi {
+  background: var(--success-glow);
+}
+
+.kz-seimei-pillar--kyou,
+.kz-seimei-pillar--daikyou {
+  background: var(--ln-red-a08);
+}
+
+.kz-seimei-pillar__name {
+  font-family: var(--font-heading);
+  font-size: calc(0.74rem / var(--ln-body-text-scale));
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
+
+.kz-seimei-pillar__value {
+  font-size: calc(1.6rem / var(--ln-body-text-scale));
+  font-weight: 900;
+  color: var(--ln-ink);
+  line-height: 1;
+}
+
+.kz-seimei-pillar__unit {
+  font-size: calc(0.7rem / var(--ln-body-text-scale));
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.kz-seimei-pillar__category {
+  margin-top: 0.25rem;
+  font-size: calc(0.72rem / var(--ln-body-text-scale));
+  font-weight: 700;
+  color: var(--ln-red-deep);
+}
+
+.kz-seimei-pillar__description {
+  margin: 0.35rem 0 0;
+  font-size: calc(0.72rem / var(--ln-body-text-scale));
+  color: var(--text-light);
+  line-height: 1.4;
+}
+
+.kz-seimei-disclaimer {
+  margin: 1rem 0 0;
+  font-size: calc(0.72rem / var(--ln-body-text-scale));
+  color: var(--text-light);
+  line-height: 1.5;
+}
+
+.kz-hanko-disclaimer {
+  margin: 0;
+  font-size: calc(0.7rem / var(--ln-body-text-scale));
+  color: var(--text-light);
+  text-align: center;
+}
+
+.kz-seal-mode-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+/* Luna Nihongo sponsor strip (between ateji and seimei handan) */
+.kz-luna-strip {
+  display: block;
+  background: var(--ln-ink);
+  color: #fff;
+  border-top: var(--border-band-top);
+  overflow: hidden;
+}
+
+.kz-luna-strip__inner {
+  position: relative;
+  max-width: var(--kz-tool-max-width);
+  margin: 0 auto;
+  padding: 0.55rem var(--page-gutter) 0;
+  min-height: 5.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kz-luna-strip__logo {
+  position: absolute;
+  left: var(--page-gutter);
+  top: 50%;
+  transform: translateY(-50%);
+  height: 3.12rem;
+  width: auto;
+  display: block;
+  z-index: 1;
+}
+
+.kz-luna-strip__cta {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 0.55rem;
+}
+
+.kz-luna-strip__fig {
+  position: absolute;
+  right: var(--page-gutter);
+  bottom: 0;
+  height: 5.35rem;
+  width: auto;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Footer */
+.kz-footer.ln-footer {
+  padding: 1.75rem var(--page-gutter) calc(1.75rem + env(safe-area-inset-bottom, 0px));
+  text-align: center;
+  background: var(--ln-cream);
+  border-top: var(--border-hairline);
+}
+
+.kz-footer__inner {
+  max-width: var(--kz-tool-max-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.kz-footer__actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-bottom: 1.1rem;
+}
+
+.kz-footer__sources {
+  font-size: calc(0.68rem / var(--ln-body-text-scale));
+  color: var(--text-light);
+  max-width: 480px;
+  line-height: 1.5;
+  margin: 0.75rem auto 0;
+}
+
+.kz-footer__sources strong {
+  color: var(--text-muted);
+}
+
+.kz-footer__seo {
+  font-size: calc(0.7rem / var(--ln-body-text-scale));
+  color: var(--text-light);
+  max-width: 480px;
+  line-height: 1.55;
+  margin: 0.75rem auto 0;
+}
+
+.kz-footer__credits {
+  font-size: calc(0.68rem / var(--ln-body-text-scale));
+  color: var(--text-light);
+  margin: 0.5rem 0 0;
+}
+
+.kz-footer__credits a {
+  color: var(--ln-red-deep);
+}
+
+/* Install prompt */
+.kz-install-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
+  background: var(--ln-ink);
+  color: #fff;
+  border-top: var(--border-band-top);
+  z-index: 100;
+  font-size: calc(0.84rem / var(--ln-body-text-scale));
+  font-weight: 500;
+}
+
+.kz-install-banner .mg-btn {
+  min-height: 2.4rem;
+  height: 2.4rem;
+  font-size: 0.8rem;
+}
+
+.kz-install-banner__dismiss {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  min-height: auto !important;
+  height: auto !important;
+  padding: 0.2rem 0.45rem !important;
+}
+
+.kz-install-banner__dismiss:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  color: #fff !important;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-max-width: 720px;
+    --kz-tool-max-width: 640px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --page-max-width: 760px;
+    --kz-tool-max-width: 680px;
+  }
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --kz-tool-max-width: 100%;
+  }
+
+  .kz-band .mg-band-inner {
+    padding-inline: var(--page-gutter);
+  }
+
+  .kz-header-actions {
+    max-width: none;
+    gap: 0.4rem;
+  }
+
+  .kz-landing .ln-header .kz-help-btn {
+    font-size: 0.7rem;
+    padding: 0 0.7rem;
+  }
+}
+
+@media (max-width: 599px) {
+  :root {
+    --page-max-width: 100%;
+  }
+
+  .kz-landing .ln-header-inner {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 0.45rem;
+  }
+
+  .kz-header-main {
+    align-items: flex-start;
+  }
+
+  .kz-header-actions {
+    justify-content: flex-end;
+    width: auto;
+    max-width: none;
+    flex-shrink: 0;
+  }
+
+  .kz-landing .ln-header .kz-help-btn {
+    font-size: 0.66rem;
+    padding: 0 0.55rem;
+    min-height: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .kz-lang-banner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .kz-lang-banner__actions {
+    justify-content: center;
+  }
+
+  .kz-band .mg-band-inner {
+    padding-inline: 1rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.75rem;
+  }
+
+  .kz-tool-card {
+    padding: 1rem;
+  }
+
+  .kz-luna-strip__inner {
+    min-height: 4.75rem;
+    padding-inline: 1rem;
+  }
+
+  .kz-luna-strip__logo {
+    left: 1rem;
+    height: 1.82rem;
+  }
+
+  .kz-luna-strip__fig {
+    height: 4.6rem;
+    right: 0.5rem;
+  }
+
+  .kz-luna-strip__cta {
+    font-size: 0.78rem;
+    padding: 0 0.9rem;
+    min-height: 2.4rem;
+    height: 2.4rem;
+  }
+
+  .kz-name-row {
+    grid-template-columns: 1fr;
+  }
+
+  .kz-name-row .lnx-select,
+  .kz-name-row .mg-btn {
+    width: 100%;
+  }
+
+  .kz-hanko-actions,
+  .kz-action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .kz-hanko-actions .mg-btn,
+  .kz-action-row .mg-btn {
+    width: 100%;
+  }
+
+  .kz-order-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .kz-order-field .kz-copy-btn {
+    align-self: flex-end;
+  }
+
+  .kz-seimei-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kz-ateji-slot {
+    flex: 1 1 5rem;
+    min-width: 5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kz-ateji-combo-chip:hover,
+  .mg-btn:hover {
+    transform: none;
+  }
+}

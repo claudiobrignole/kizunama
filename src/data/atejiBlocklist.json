@@ -1,0 +1,9 @@
+{
+  "_comment": "Manually curated exclusion list for the ateji candidate engine: kanji whose dominant meaning is death, disease, crime, curse or another clearly inauspicious concept. Seeded from a keyword scan of KANJIDIC2 English meanings, then hand-reviewed to drop false positives (e.g. common/neutral kanji that only had a stray secondary gloss like 'die' as in a dice/mould sense, or characters like 武/戦/兵 whose primary sense is warrior/martial and are common, welcome name components). Extend this list over time rather than relying purely on automated keyword matching.",
+  "chars": [
+    "死", "病", "悪", "惡", "罪", "呪", "殺", "盗", "盜", "犯", "毒", "鬼", "魔",
+    "醜", "汚", "腐", "恥", "辱", "廃", "敗", "滅", "壊", "壞", "狂", "愚", "痴",
+    "詐", "偽", "僞", "欺", "虜", "隷", "奴", "囚", "獄", "罰", "刑", "拷", "惨",
+    "酷", "憎", "嫌", "恨", "怨", "尿", "吐", "没", "崩", "厄", "災", "禍", "凶", "乱"
+  ]
+}

@@ -1,0 +1,411 @@
+/* ════════════════════════════════════════════════════════════════
+   LUNA NIHONGO — Design Tokens (consolidated, portable snapshot)
+   Source of truth: luna-nihongo/src/index.css + DESIGN_SYSTEM.md
+   Snapshot date: 2026-07-10
+   Style: flat manga-editorial — hard offset shadows, ink outlines,
+   one brand red, no gradients, no glassmorphism on content.
+
+   This is the single-file design system used by Kizunama (imported via
+   src/styles/index.css). Root copy LUNA_NIHONGO_DESIGN_TOKENS.css is
+   kept as a portable mirror for other projects.
+
+   Import order matters only for the @import of Google Fonts (must
+   be first). Everything else is plain :root custom properties plus
+   a handful of reusable classes (.mg-*, .ln-*, .lnx-*).
+   ════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700;800;900&family=Noto+Serif+JP:wght@700&family=Outfit:wght@300;400;500;600;700;800;900&family=Yuji+Syuku&display=swap');
+
+/* ──────────────────────────────────────────────────────────────
+   1. TYPOGRAPHY
+   Bricolage Grotesque = latin headings/display (600–700).
+   Noto Sans = latin body/UI (pairs 1:1 with Noto Sans JP so mixed
+   IT/EN + 日本語 runs align visually).
+   Noto Sans JP = Japanese only (lang="ja" / .ja-text).
+   Yuji Syuku = decorative calligraphy only (ribbons, vertical labels).
+   NEVER Plus Jakarta Sans. NEVER Inter/Roboto for brand surfaces.
+   ────────────────────────────────────────────────────────────── */
+:root {
+  --font-heading: 'Bricolage Grotesque', 'Outfit', system-ui, sans-serif;
+  --font-body: 'Noto Sans', system-ui, sans-serif;
+  --font-japanese: 'Noto Sans JP', 'Hiragino Kaku Gothic Pro', sans-serif;
+  --ln-font-display: var(--font-japanese);
+  --ln-font-brush: 'Yuji Syuku', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+
+  /* Noto Sans has a tall x-height and reads large: small root bump only. */
+  --ln-body-text-scale: 1.06;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-extrabold: 800;
+  --fw-black: 900;
+
+  --text-display: 2.8rem;   /* h1 / hero */
+  --text-h2: 2rem;          /* band titles */
+  --text-h3: 1.4rem;
+  --text-h4: 1.25rem;
+  --text-body: 1rem;
+  --text-sm: 0.9rem;
+  --text-xs: 0.78rem;
+  --text-2xs: 0.68rem;      /* badges, index labels */
+
+  --tracking-tight: -0.03em;   /* large headings */
+  --tracking-index: 0.22em;    /* "01.STUDY" index labels */
+  --tracking-brush: 0.35em;    /* vertical calligraphy */
+
+  --leading-tight: 1.2;
+  --leading-title: 1.32;
+  --leading-body: 1.5;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   2. COLORS
+   Flat manga editorial palette: one brand red, supporting band
+   hues, ink outline, warm washi paper. No bluish-purple gradients.
+   ────────────────────────────────────────────────────────────── */
+:root {
+  /* Surfaces / paper */
+  --ln-cream: #faf6ed;        /* page background + header ONLY */
+  --ln-washi: #efe3c8;        /* beige hero / band 01 */
+  --ln-card-bg: #ffffff;      /* every elevated surface: cards, panels, inputs */
+
+  /* Ink (outlines, text, shadows) */
+  --ln-ink: #2b2333;          /* outline / text / hard shadow base — never pure #000 */
+
+  /* Brand red — the single brand red */
+  --ln-red: #d6304a;          /* hero bands, CTA, chat, links, accents, errors */
+  --ln-red-deep: #a8203a;     /* hover / pressed / shadow on red */
+  --ln-red-rgb: 214, 48, 74;
+  --ln-red-a08: rgba(var(--ln-red-rgb), 0.08);
+  --ln-red-a10: rgba(var(--ln-red-rgb), 0.10);
+  --ln-red-a12: rgba(var(--ln-red-rgb), 0.12);
+  --ln-red-a15: rgba(var(--ln-red-rgb), 0.15);
+  --ln-red-a20: rgba(var(--ln-red-rgb), 0.20);
+  --ln-red-a25: rgba(var(--ln-red-rgb), 0.25);
+  --ln-red-a40: rgba(var(--ln-red-rgb), 0.40);
+
+  /* Supporting band hues */
+  --ln-yellow: #f0a92e;       /* band 02, crescent moon, accents */
+  --ln-purple: #7c4bb2;       /* band 03, obi, AI accents */
+  --ln-purple-deep: #5b3389;  /* hover / shadow on purple */
+  --ln-sakura: #f5d6dc;       /* soft pink band (anime/manga section) */
+  --ln-teal: #2f8fa8;         /* secondary accent only (scarf, obijime) — never a band */
+
+  /* Hard-shadow tints (offset, 0 blur) */
+  --ln-shadow: rgba(43, 35, 51, 0.30);
+  --ln-card-border: var(--ln-ink);
+  --ln-card-shadow: rgba(43, 35, 51, 0.18);
+  --ln-card-shadow-strong: rgba(43, 35, 51, 0.28);
+
+  /* Semantic aliases — everything maps onto the brand red.
+     Rule: never use #e74c3c, hsl(350,85%,50%) or any other red. */
+  --primary: var(--ln-red);
+  --primary-hover: var(--ln-red-deep);
+  --primary-light: var(--ln-red-a10);
+  --primary-glow: var(--ln-red-a15);
+  --secondary: var(--ln-purple);
+  --accent: var(--ln-yellow);
+
+  --success: hsl(150, 75%, 40%);
+  --success-glow: hsla(150, 75%, 40%, 0.15);
+  --error: var(--ln-red);
+  --error-glow: var(--ln-red-a15);
+  --warning: var(--ln-yellow);
+
+  /* App surfaces */
+  --bg-app: var(--ln-cream);
+  --bg-panel: var(--ln-card-bg);
+  --bg-input: #ffffff;
+  --border: hsla(220, 15%, 15%, 0.08);
+  --border-glow: var(--ln-red-a15);
+
+  /* Text */
+  --text-main: hsl(220, 20%, 18%);
+  --text-muted: hsl(220, 10%, 45%);
+  --text-light: hsl(220, 10%, 65%);
+  --text-inverse: #ffffff;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   3. SPACING, RADII, LAYOUT
+   Manga is square-ish; bands are radius 0. Cards/panels 10–14px.
+   Buttons/badges/chips are full pill (999px). Inputs 10px.
+   ────────────────────────────────────────────────────────────── */
+:root {
+  --page-max-width: 1100px;
+  --page-gutter: 1.5rem;
+  --mg-section-gap: 2.5rem;
+  --mg-band-min-height: 460px;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  --radius-band: 0;
+  --radius-card: 10px;
+  --radius-panel: 14px;
+  --radius-input: 10px;
+  --radius-bubble: 16px;
+  --radius-pill: 999px;
+
+  --btn-height: 2.6875rem;     /* ~43px */
+  --btn-padding-x: 1.25rem;
+  --btn-font-size: 0.92rem;
+  --btn-gap: 0.45rem;
+  --hit-target-min: 44px;      /* never go below this on touch */
+}
+
+/* ──────────────────────────────────────────────────────────────
+   4. EFFECTS — borders, hard shadows, motion, patterns
+   Signature: HARD offset shadows (x=y, 0 blur). No soft blur, no
+   glassmorphism on content. Bands have a 3px ink top border.
+   ────────────────────────────────────────────────────────────── */
+:root {
+  --border-ink: 2px solid var(--ln-ink);      /* cards, buttons, badges */
+  --border-band-top: 3px solid var(--ln-ink); /* top edge of every band */
+  --border-hairline: 1px solid var(--border); /* subtle dividers inside app UI */
+
+  --shadow-card: 6px 6px 0 var(--ln-shadow);
+  --shadow-panel: 5px 5px 0 var(--ln-card-shadow);
+  --shadow-btn: 4px 4px 0 var(--ln-shadow);
+  --shadow-btn-hover: 6px 6px 0 var(--ln-shadow);
+  --shadow-btn-active: 2px 2px 0 var(--ln-shadow);
+  --shadow-badge: 3px 3px 0 var(--ln-shadow);
+
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.05); /* chat bubbles, dropdowns only */
+
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  --focus-ring: 3px solid var(--ln-yellow);
+
+  --halftone-size: 11px;
+  --halftone: radial-gradient(circle, var(--ln-ink) 1.2px, transparent 1.4px);
+}
+
+.ln-halftone {
+  background-image: var(--halftone);
+  background-size: var(--halftone-size) var(--halftone-size);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   5. BASE ELEMENT STYLES
+   ────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  height: 100%;
+  font-size: calc(100% * var(--ln-body-text-scale));
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: var(--leading-body);
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:lang(ja), .ja-text { font-family: var(--font-japanese); }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-bold);
+  line-height: var(--leading-tight);
+  color: var(--text-main);
+}
+h1 { font-size: calc(var(--text-display) / var(--ln-body-text-scale)); letter-spacing: var(--tracking-tight); }
+h2 { font-size: calc(var(--text-h2) / var(--ln-body-text-scale)); letter-spacing: -0.02em; }
+h3 { font-size: calc(var(--text-h3) / var(--ln-body-text-scale)); font-weight: var(--fw-semibold); }
+h4 { font-size: calc(var(--text-h4) / var(--ln-body-text-scale)); }
+
+a { color: var(--primary); text-decoration: none; transition: color var(--transition-fast); }
+a:hover { color: var(--primary-hover); }
+
+button { cursor: pointer; border: none; background: none; font-family: var(--font-body); transition: all var(--transition-fast); }
+
+input, select, textarea { font-family: var(--font-body); outline: none; }
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+select,
+textarea {
+  border: var(--border-ink);
+  border-radius: var(--radius-input);
+  background: var(--ln-card-bg);
+  color: var(--text-main);
+  padding: 0 0.85rem;
+  height: var(--btn-height);
+}
+textarea { padding: 0.6rem 0.85rem; height: auto; }
+
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 1px;
+  border-color: var(--ln-ink);
+}
+
+::selection { background: var(--ln-red-a20); }
+
+/* ──────────────────────────────────────────────────────────────
+   6. LAYOUT KIT — header, manga bands, buttons, cards, badges
+   ────────────────────────────────────────────────────────────── */
+
+/* Header */
+.ln-header { position: sticky; top: 0; z-index: 100; background: var(--ln-cream); border-bottom: 1px solid var(--border); }
+.ln-header-inner { max-width: var(--page-max-width); margin: 0 auto; padding: .7rem var(--page-gutter); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.ln-header-logo { height: 2.4rem; width: auto; display: block; }
+.ln-nav { display: flex; align-items: center; gap: .15rem; }
+.ln-nav a { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem .85rem; border-radius: 12px; color: var(--text-muted); font-weight: 600; font-size: .88rem; white-space: nowrap; cursor: pointer; }
+.ln-nav a:hover { color: var(--ln-red); background: var(--ln-red-a15); }
+.ln-nav a.active { color: var(--ln-red); background: var(--ln-red-a15); }
+.ln-header-actions { display: flex; align-items: center; gap: .45rem; }
+
+/* Bands */
+.mg-landing { width: 100%; display: flex; flex-direction: column; color: var(--ln-ink); }
+.mg-band { position: relative; overflow: hidden; border-top: 3px solid var(--ln-ink); }
+.mg-band--red { background: var(--ln-red); color: #fff; }
+.mg-band--washi { background: var(--ln-washi); color: var(--ln-ink); }
+.mg-band--yellow { background: var(--ln-yellow); color: var(--ln-ink); }
+.mg-band--purple { background: var(--ln-purple); color: #fff; }
+.mg-band--sakura { background: var(--ln-sakura); color: var(--ln-ink); }
+.mg-band--ink { background: var(--ln-ink); color: var(--ln-cream); }
+.mg-band-inner { position: relative; max-width: var(--page-max-width); margin: 0 auto; padding: 2.75rem var(--page-gutter) 3rem; min-height: 460px; }
+.mg-band-copy { position: relative; max-width: 30rem; z-index: 2; }
+.mg-index { font-family: var(--font-heading); font-weight: 700; font-size: .8rem; letter-spacing: .22em; }
+.mg-band-title { font-weight: 900; font-size: clamp(1.55rem, 3.5vw, 2.2rem); line-height: 1.3; margin: .45rem 0 .55rem; color: inherit; }
+.mg-band-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem; margin-bottom: .15rem; }
+.mg-band-lead { font-size: 1.05rem; line-height: 1.55; font-weight: 600; margin: 0 0 .65rem; }
+.mg-band-features { list-style: none; margin: 0 0 .85rem; padding: 0; font-size: .9rem; line-height: 1.55; }
+.mg-band-features li { position: relative; padding-left: 1.1rem; margin-bottom: .4rem; }
+.mg-band-features li::before { content: ''; position: absolute; left: 0; top: .55em; width: .45rem; height: .45rem; border-radius: 50%; background: var(--ln-red); border: 1px solid var(--ln-ink); }
+.mg-band--yellow .mg-band-features li::before, .mg-band--washi .mg-band-features li::before { background: var(--ln-yellow); }
+.mg-band--sakura .mg-band-features li::before { background: var(--ln-purple); }
+
+/* Watermark + vertical label + figure */
+.mg-watermark { position: absolute; top: -3.5rem; right: 7%; font-family: var(--font-heading); font-weight: 800; font-size: clamp(10rem, 24vw, 17rem); line-height: 1; opacity: .13; pointer-events: none; user-select: none; z-index: 0; }
+.mg-vertical { position: absolute; right: .6rem; top: 50%; transform: translateY(-50%); writing-mode: vertical-rl; font-family: var(--ln-font-brush); font-size: .85rem; letter-spacing: .35em; opacity: .65; z-index: 2; }
+.mg-fig { position: absolute; right: 4%; bottom: 0; height: 380px; display: flex; align-items: flex-end; z-index: 1; pointer-events: none; }
+.mg-fig img { height: 100%; width: auto; display: block; }
+.mg-hero .mg-fig { height: 410px; }
+.mg-band--washi .mg-fig { height: 418px; }
+.mg-band--purple .mg-band-inner { min-height: 500px; }
+.mg-band--purple .mg-fig { height: 456px; }
+.mg-band--ink .mg-fig { top: 50%; bottom: auto; transform: translateY(-50%); align-items: center; }
+
+/* Hero */
+.mg-hero .mg-band-inner { min-height: 490px; padding-top: 3.5rem; }
+.mg-hero-title { font-family: var(--font-heading); font-weight: 700; font-size: clamp(1.8rem, 4.5vw, 2.8rem); line-height: 1.32; color: #fff; margin: 0 0 1.1rem; }
+.mg-hero-lead { font-size: 1.05rem; line-height: 1.65; font-weight: 600; margin: 0 0 .65rem; color: var(--ln-ink); }
+.mg-hero-cta { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: .5rem; }
+.mg-stats { display: flex; flex-wrap: wrap; gap: 1.4rem; margin: .85rem 0 1rem; }
+.mg-stats > div { display: flex; flex-direction: column; line-height: 1.15; }
+.mg-stats strong { font-family: var(--font-heading); font-weight: 800; font-size: 1.4rem; color: var(--ln-ink); }
+.mg-stats span { font-size: .76rem; color: var(--text-muted); }
+
+/* Corner ribbon */
+.mg-ribbon { position: absolute; top: 0; right: 0; width: 130px; height: 130px; clip-path: polygon(100% 0, 0 0, 100% 100%); background: var(--ln-yellow); z-index: 3; }
+.mg-ribbon span { position: absolute; top: 26px; right: 8px; transform: rotate(45deg); font-family: var(--ln-font-brush); font-size: 1rem; color: var(--ln-ink); }
+
+/* Footer */
+.ln-footer { padding: 2rem var(--page-gutter); text-align: center; background: #fff; border-top: 1px solid var(--border); color: var(--text-light); font-size: .9rem; }
+.ln-footer-inner { max-width: var(--page-max-width); margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+
+@media (max-width: 760px) {
+  .mg-fig { opacity: .18; right: -4%; }
+  .mg-band-copy { max-width: none; }
+}
+
+/* Buttons / cards / badges */
+.mg-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--btn-gap); box-sizing: border-box; min-height: var(--btn-height); height: var(--btn-height); padding: 0 var(--btn-padding-x); border: 2px solid var(--ln-ink); border-radius: 999px; font-family: var(--font-heading); font-weight: 700; font-size: var(--btn-font-size); line-height: 1; cursor: pointer; background: #fff; color: var(--ln-ink); box-shadow: 4px 4px 0 var(--ln-shadow); transition: transform var(--transition-fast), box-shadow var(--transition-fast); text-decoration: none; }
+.mg-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ln-shadow); color: var(--ln-ink); }
+.mg-btn:active { transform: translate(0, 0); box-shadow: 2px 2px 0 var(--ln-shadow); }
+.mg-btn:focus-visible { outline: 3px solid var(--ln-yellow); outline-offset: 2px; }
+.mg-btn--red { background: var(--ln-red); color: #fff; border-color: #fff; }
+.mg-btn--red:hover { color: #fff; }
+.mg-btn--ink { background: var(--ln-ink); color: var(--ln-cream); border-color: #fff; }
+.mg-btn--ink:hover { color: var(--ln-cream); }
+.mg-btn--yellow { background: var(--ln-red); color: #fff; border-color: #fff; }
+.mg-btn--yellow:hover { color: #fff; }
+.mg-btn--purple { background: var(--ln-purple); color: #fff; border-color: #fff; }
+.mg-btn--purple:hover { color: #fff; }
+
+.mg-card { background: #fff; color: var(--ln-ink); border: 2px solid var(--ln-ink); border-radius: 10px; box-shadow: 6px 6px 0 var(--ln-shadow); padding: 1.15rem 1.3rem; }
+
+.mg-badge { display: inline-flex; align-items: center; padding: .2rem .65rem; border-radius: 999px; border: 2px solid var(--ln-ink); box-shadow: 3px 3px 0 var(--ln-shadow); font-family: var(--font-heading); font-weight: 700; font-size: .68rem; letter-spacing: .04em; white-space: nowrap; }
+.mg-badge--free, .mg-badge--trial, .mg-badge--live { background: var(--ln-red); color: #fff; }
+.mg-badge--otaku { background: #fff; color: var(--ln-ink); }
+
+/* ──────────────────────────────────────────────────────────────
+   7. FORM PRIMITIVES — lnx-* (chips, inputs, selects)
+   ────────────────────────────────────────────────────────────── */
+.lnx-chip {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  min-height: 2.65rem; padding: 0.5rem 0.9rem; border-radius: 12px;
+  border: 1px solid var(--border); background: #fff;
+  font-family: var(--font-body); font-size: 0.82rem; font-weight: 600; line-height: 1.25;
+  text-align: center; color: var(--text-muted); cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast),
+    box-shadow var(--transition-fast), transform var(--transition-fast), background var(--transition-fast);
+}
+.lnx-chip:hover:not(:disabled) { border-color: var(--ln-red); color: var(--text-main); }
+.lnx-chip:focus-visible { outline: var(--focus-ring); outline-offset: 1px; }
+.lnx-chip[aria-pressed='true'] {
+  transform: translateY(-1px); color: #fff; border-color: var(--ln-red);
+  background: linear-gradient(135deg, var(--ln-red), var(--ln-red-deep));
+  box-shadow: 0 3px 12px var(--ln-red-a15);
+}
+.lnx-chip:disabled { opacity: 0.42; cursor: not-allowed; }
+
+.lnx-field { display: flex; flex-direction: column; gap: 0.3rem; }
+.lnx-field__label { font-size: 0.78rem; font-weight: 700; color: var(--text-main); }
+
+.lnx-input {
+  width: 100%; box-sizing: border-box; height: var(--btn-height); padding: 0 0.85rem;
+  border: 2px solid var(--ln-ink); border-radius: var(--radius-input);
+  background: #fff; color: var(--text-main); font-family: var(--font-body); font-size: 0.92rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.lnx-input::placeholder { color: var(--text-light); }
+.lnx-input:focus-visible { outline: var(--focus-ring); outline-offset: 1px; border-color: var(--ln-ink); }
+
+.lnx-select {
+  height: var(--btn-height); padding: 0 0.85rem; border: 2px solid var(--ln-ink);
+  border-radius: var(--radius-input); background: #fff; color: var(--text-main);
+  font-family: var(--font-body); font-size: 0.82rem; font-weight: 600;
+}
+.lnx-select:focus-visible { outline: var(--focus-ring); outline-offset: 1px; }
+
+/* ════════════════════════════════════════════════════════════════
+   USAGE
+   - New project: copy this whole file, import it once at the app
+     entry point (before any component CSS), done.
+   - This repo (Kizunama): imported from src/styles/index.css (single
+     file at src/styles/luna-nihongo-design-tokens.css). Root copy
+     LUNA_NIHONGO_DESIGN_TOKENS.css is kept as a portable mirror.
+   - Do / Don't: flat bands with radius 0, hard offset shadows
+     (x=y, 0 blur), a single brand red (--ln-red), Bricolage
+     Grotesque for latin headings, Noto Sans for latin body, Noto
+     Sans JP for Japanese only, Yuji Syuku only for calligraphy —
+     never Plus Jakarta Sans / Inter / Roboto, never glassmorphism
+     on content, never a second red.
+   ════════════════════════════════════════════════════════════════ */

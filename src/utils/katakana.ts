@@ -3,6 +3,7 @@ import * as wanakana from 'wanakana';
 import nameDict from '../data/nameKatakanaDict.json';
 import { ipaToKatakana } from './ipaToKatakana';
 import { approximatePronunciation, type PhoneticLanguage } from './languagePhonetics';
+import { applyEpenthesis } from './romajiEpenthesis';
 
 export type KatakanaMethod = 'dictionary' | 'phonetic' | 'rule-based' | 'fallback';
 export type KatakanaLanguage = 'en' | PhoneticLanguage;
@@ -58,8 +59,12 @@ export async function nameToKatakana(name: string, lang: KatakanaLanguage = 'en'
       return { katakana: phonetic, method: 'phonetic' };
     }
   } else {
-    const approx = approximatePronunciation(asciiName, lang);
-    const katakana = wanakana.toKatakana(approx);
+    const { romaji, lengthenFinalVowel } = approximatePronunciation(asciiName, lang);
+    const epenthesized = applyEpenthesis(romaji);
+    let katakana = wanakana.toKatakana(epenthesized);
+    if (katakana && lengthenFinalVowel) {
+      katakana += 'ー';
+    }
     if (katakana) {
       return { katakana, method: 'rule-based' };
     }

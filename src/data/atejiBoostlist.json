@@ -1,0 +1,4 @@
+{
+  "_comment": "Kanji historically attested as sound-based ateji (mostly country-name characters still used in fossilised compounds like 日米, 日独伊). Candidates on this list get a small ranking bonus in utils/ateji.ts — additive, never a requirement.",
+  "chars": ["米", "仏", "独", "伊", "英", "露", "葡", "亜", "加", "羅"]
+}

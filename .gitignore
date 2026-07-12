@@ -7,10 +7,17 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+design-system/
+__MACOSX/
 node_modules
 dist
 dist-ssr
 *.local
+
+# Env files
+.env
+.env.*
+!.env.example
 
 # Editor directories and files
 .vscode/*

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getInstallCopy } from '../i18n/installPrompt';
+import { useI18n } from '../i18n/context';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -9,6 +9,7 @@ interface BeforeInstallPromptEvent extends Event {
 const DISMISS_KEY = 'kz-install-dismissed';
 
 export function InstallPrompt() {
+  const { messages } = useI18n();
   const [deferredEvent, setDeferredEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -25,7 +26,7 @@ export function InstallPrompt() {
 
   if (!visible || !deferredEvent) return null;
 
-  const copy = getInstallCopy(navigator.language || 'en');
+  const copy = messages.install;
 
   const handleInstall = async () => {
     setVisible(false);
@@ -42,14 +43,14 @@ export function InstallPrompt() {
   };
 
   return (
-    <div className="kz-install-banner" role="dialog" aria-label="Install app">
+    <div className="kz-install-banner" role="dialog" aria-label={copy.install}>
       <span>{copy.text}</span>
       <span style={{ display: 'flex', gap: '0.4rem' }}>
-        <button type="button" onClick={handleInstall}>
+        <button type="button" className="mg-btn mg-btn--red" onClick={handleInstall}>
           {copy.install}
         </button>
-        <button type="button" className="kz-install-banner__dismiss" onClick={handleDismiss} aria-label={copy.dismiss}>
-          ✕
+        <button type="button" className="mg-btn kz-install-banner__dismiss" onClick={handleDismiss} aria-label={copy.dismiss}>
+          {copy.dismiss}
         </button>
       </span>
     </div>

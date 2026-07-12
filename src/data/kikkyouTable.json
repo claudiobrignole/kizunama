@@ -1,0 +1,22 @@
+{
+  "_comment": "Classic 1-81 kakusū (stroke-count) fortune classification used by the Kumazaki-school gokaku-bōshōhō seimei handan method. This is folk numerology, not an exact science: multiple schools publish tables that agree on the overall structure but diverge on roughly 5-10 individual numbers (e.g. whether 24 or 32 is 'saidaikichi' vs 'daikichi'). This is one commonly reproduced version, used as Kizunama's single default school — see the in-app disclaimer and README for the caveat.",
+  "categories": {
+    "1": "daikichi", "2": "kyou", "3": "daikichi", "4": "kyou", "5": "daikichi",
+    "6": "daikichi", "7": "daikichi", "8": "daikichi", "9": "daikyou", "10": "daikyou",
+    "11": "daikichi", "12": "kyou", "13": "daikichi", "14": "kyou", "15": "daikichi",
+    "16": "daikichi", "17": "daikichi", "18": "daikichi", "19": "daikyou", "20": "daikyou",
+    "21": "daikichi", "22": "kyou", "23": "daikichi", "24": "daikichi", "25": "kichi",
+    "26": "kyou", "27": "hankichi", "28": "kyou", "29": "daikichi", "30": "hankichi",
+    "31": "daikichi", "32": "daikichi", "33": "daikichi", "34": "daikyou", "35": "daikichi",
+    "36": "kyou", "37": "daikichi", "38": "hankichi", "39": "daikichi", "40": "kyou",
+    "41": "daikichi", "42": "hankichi", "43": "hankichi", "44": "daikyou", "45": "daikichi",
+    "46": "kyou", "47": "daikichi", "48": "daikichi", "49": "kyou", "50": "hankichi",
+    "51": "hankichi", "52": "daikichi", "53": "hankichi", "54": "daikyou", "55": "hankichi",
+    "56": "kyou", "57": "daikichi", "58": "hankichi", "59": "kyou", "60": "kyou",
+    "61": "daikichi", "62": "kyou", "63": "daikichi", "64": "daikyou", "65": "daikichi",
+    "66": "kyou", "67": "daikichi", "68": "daikichi", "69": "kyou", "70": "kyou",
+    "71": "hankichi", "72": "hankichi", "73": "kichi", "74": "kyou", "75": "hankichi",
+    "76": "kyou", "77": "hankichi", "78": "hankichi", "79": "kyou", "80": "hankichi",
+    "81": "daikichi"
+  }
+}

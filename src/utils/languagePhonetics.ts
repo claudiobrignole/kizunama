@@ -21,6 +21,12 @@ const ITALIAN_RULES: Rule[] = [
   [/gi/g, 'ji'],
   [/ge/g, 'je'],
   [/qu/g, 'kw'],
+  // Any "c" not already turned into "chi"/"che" above (and not part of a
+  // "ch" digraph, which was already consumed by the first rule) is a plain
+  // /k/ sound — including before another consonant, e.g. Italian "cl" in
+  // "Claudio". Without this, letters like "c" in a consonant cluster are
+  // left as literal Latin text that wanakana cannot convert at all.
+  [/c(?!h)/g, 'k'],
   [/z/g, 'ts'],
 ];
 
@@ -103,10 +109,36 @@ export const PHONETIC_LANGUAGES: Array<{ id: PhoneticLanguage | 'en'; label: str
   { id: 'pt', label: 'Português' },
 ];
 
-export function approximatePronunciation(text: string, lang: PhoneticLanguage): string {
-  let result = text.toLowerCase();
+export interface PhoneticApproximation {
+  /** Rough romaji-ish spelling, still needing romajiEpenthesis before it is
+   * safe to feed to wanakana. */
+  romaji: string;
+  /** French names very commonly end in a silent "e" that leaves the
+   * preceding vowel stressed and open (Marie, Sophie, Amélie...). The
+   * established Japanese transliteration convention lengthens that final
+   * vowel with a chōonpu (マリー, not マリ) rather than dropping it or
+   * reading the "e" aloud (which wanakana would otherwise do, producing
+   * マリエ). */
+  lengthenFinalVowel: boolean;
+}
+
+/** Word-final "vowel + silent e" (Marie, Sophie, Amélie, Renée...). Only
+ * strips the trailing "e" when it is not itself needed to carry a sound
+ * (i.e. it directly follows a vowel letter, not a consonant). */
+const FRENCH_SILENT_FINAL_E = /([aeiou])e$/;
+
+export function approximatePronunciation(text: string, lang: PhoneticLanguage): PhoneticApproximation {
+  let source = text.toLowerCase();
+  let lengthenFinalVowel = false;
+
+  if (lang === 'fr' && FRENCH_SILENT_FINAL_E.test(source)) {
+    source = source.slice(0, -1);
+    lengthenFinalVowel = true;
+  }
+
+  let result = source;
   for (const [pattern, replacement] of RULES[lang]) {
     result = result.replace(pattern, replacement);
   }
-  return result;
+  return { romaji: result, lengthenFinalVowel };
 }

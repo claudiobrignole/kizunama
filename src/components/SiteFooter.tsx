@@ -1,23 +1,34 @@
-import { SPONSOR_URL } from '../config';
+import { useI18n } from '../i18n/context';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
-export function SiteFooter() {
+interface SiteFooterProps {
+  onOpenHelp: () => void;
+}
+
+export function SiteFooter({ onOpenHelp }: SiteFooterProps) {
+  const { messages } = useI18n();
+
   return (
-    <footer className="kz-footer">
-      <a className="kz-btn" href={SPONSOR_URL} target="_blank" rel="noopener noreferrer">
-        🌙 Secret sponsor
-      </a>
-      <p className="kz-footer__seo">
-        絆名 | Kizunama — a free tool to discover your Japanese Kanji name by meaning, generate a
-        katakana reading of your name, and create a downloadable Hanko seal. No AI, no account,
-        works offline once installed. Kanji data from KANJIDIC2 (EDRDG licence); katakana
-        conversion via any-ascii, phonemizer/eSpeak-NG and wanakana.
-      </p>
-      <p className="kz-footer__credits">
-        © {new Date().getFullYear()} Kizunama · Made by{' '}
-        <a href="https://brignole.ch" target="_blank" rel="noopener noreferrer">
-          brignole.ch
-        </a>
-      </p>
+    <footer className="kz-footer ln-footer">
+      <div className="kz-footer__inner">
+        <div className="kz-footer__actions">
+          <LanguageSwitcher variant="footer" />
+          <button type="button" className="mg-btn kz-help-btn" onClick={onOpenHelp}>
+            {messages.header.helpButton}
+          </button>
+        </div>
+
+        <p className="kz-footer__seo">{messages.footer.seo}</p>
+        <p className="kz-footer__sources">
+          <strong>{messages.footer.sourcesTitle}.</strong> {messages.footer.sourcesBody}
+        </p>
+        <p className="kz-footer__credits">
+          © {new Date().getFullYear()} Kizunama · {messages.footer.credits}{' '}
+          <a href="https://brignole.ch" target="_blank" rel="noopener noreferrer">
+            brignole.ch
+          </a>
+        </p>
+      </div>
     </footer>
   );
 }

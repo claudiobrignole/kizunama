@@ -1,11 +1,37 @@
 import { useState } from 'react';
 import { nameToKatakana, type KatakanaLanguage, type KatakanaResult } from '../utils/katakana';
 import { PHONETIC_LANGUAGES } from '../utils/languagePhonetics';
+import { useI18n } from '../i18n/context';
+import { CredibilityBadge } from './CredibilityBadge';
 
-export function NameKatakana() {
-  const [name, setName] = useState('');
-  const [lang, setLang] = useState<KatakanaLanguage>('en');
-  const [result, setResult] = useState<KatakanaResult | null>(null);
+interface NameKatakanaProps {
+  name: string;
+  onNameChange: (name: string) => void;
+  lang: KatakanaLanguage;
+  onLangChange: (lang: KatakanaLanguage) => void;
+  result: KatakanaResult | null;
+  onResult: (result: KatakanaResult | null) => void;
+  /** 'given' shows the language selector; 'surname' reuses the same lang
+   * (no second selector — given + surname share one phonetic engine). */
+  variant?: 'given' | 'surname';
+  showCredibility?: boolean;
+}
+
+export function NameKatakana({
+  name,
+  onNameChange,
+  lang,
+  onLangChange,
+  result,
+  onResult,
+  variant = 'given',
+  showCredibility = true,
+}: NameKatakanaProps) {
+  const { messages } = useI18n();
+  const isGiven = variant === 'given';
+  const t = isGiven
+    ? messages.nameKatakana
+    : { ...messages.nameKatakana, placeholder: messages.surnameField.placeholder };
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -15,7 +41,7 @@ export function NameKatakana() {
     setCopied(false);
     try {
       const r = await nameToKatakana(name, lang);
-      setResult(r);
+      onResult(r);
     } finally {
       setLoading(false);
     }
@@ -28,41 +54,48 @@ export function NameKatakana() {
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {
-      // ignore
+      // Clipboard API unavailable; silently ignore.
     }
   };
 
   return (
-    <div className="kz-panel kz-panel--compact kz-section--katakana">
-      <p className="kz-section-title kz-section-title--sub">🔤 Your name in Katakana</p>
-      <div className="kz-name-row">
+    <div className="mg-card kz-tool-card">
+      <div className={`kz-name-row${isGiven ? '' : ' kz-name-row--no-lang'}`}>
         <input
-          className="kz-input"
+          className="lnx-input"
           type="text"
-          placeholder="Your name"
+          placeholder={t.placeholder}
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            onNameChange(e.target.value);
+            onResult(null);
+          }}
           onKeyDown={(e) => e.key === 'Enter' && handleConvert()}
           maxLength={40}
         />
-        <select className="kz-select" value={lang} onChange={(e) => setLang(e.target.value as KatakanaLanguage)}>
-          {PHONETIC_LANGUAGES.map((l) => (
-            <option key={l.id} value={l.id}>
-              {l.label}
-            </option>
-          ))}
-        </select>
-        <button type="button" className="kz-btn kz-btn--primary" onClick={handleConvert} disabled={loading || !name.trim()}>
-          {loading ? '…' : '→'}
+        {isGiven && (
+          <select className="lnx-select" value={lang} onChange={(e) => onLangChange(e.target.value as KatakanaLanguage)}>
+            {PHONETIC_LANGUAGES.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.label}
+              </option>
+            ))}
+          </select>
+        )}
+        <button type="button" className="mg-btn mg-btn--red" onClick={handleConvert} disabled={loading || !name.trim()}>
+          {loading ? t.converting : t.convert}
         </button>
       </div>
-      {loading && <p className="kz-loading-note">Loading phonetic engine…</p>}
+      {loading && <p className="kz-loading-note">{t.loading}</p>}
       {result && result.katakana && (
         <div className="kz-katakana-result">
-          <span className="kz-katakana-result__text">{result.katakana}</span>
+          <span className="kz-katakana-result__text" lang="ja">
+            {result.katakana}
+          </span>
           <button type="button" className="kz-copy-btn" onClick={handleCopy}>
-            {copied ? '✅ Copied' : 'Copy'}
+            {copied ? t.copied : t.copy}
           </button>
+          {showCredibility && <CredibilityBadge katakana={result.katakana} />}
         </div>
       )}
     </div>

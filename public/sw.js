@@ -1,5 +1,13 @@
-const CACHE_NAME = 'kizunama-v1';
-const CORE_ASSETS = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
+const CACHE_NAME = 'kizunama-v4';
+const CORE_ASSETS = [
+  '/',
+  '/manifest.webmanifest',
+  '/icons/icon.svg',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/favicon-32.png',
+  '/fonts/NotoSerifJP-Bold.woff',
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
