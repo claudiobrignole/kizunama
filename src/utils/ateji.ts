@@ -1,4 +1,3 @@
-import atejiIndexData from '../data/atejiIndex.json';
 import { isHardMora, moraSegment } from './mora';
 
 export interface AtejiIndexCandidate {
@@ -20,7 +19,22 @@ interface AtejiIndex {
   readings: Record<string, AtejiIndexCandidate[]>;
 }
 
-const atejiIndex = atejiIndexData as unknown as AtejiIndex;
+/** Cached load of the ~1 MB reading index (own Vite chunk). */
+let atejiIndexPromise: Promise<AtejiIndex> | null = null;
+
+export function loadAtejiIndex(): Promise<AtejiIndex> {
+  if (!atejiIndexPromise) {
+    atejiIndexPromise = import('../data/atejiIndex.json').then(
+      (mod) => mod.default as unknown as AtejiIndex,
+    );
+  }
+  return atejiIndexPromise;
+}
+
+/** Warm the ateji chunk during idle time after first paint. */
+export function prefetchAtejiIndex(): void {
+  void loadAtejiIndex();
+}
 
 const READING_TYPE_WEIGHT: Record<AtejiIndexCandidate['readingType'], number> = {
   on: 100,
@@ -95,13 +109,13 @@ function spanScore(span: AtejiSpan): number {
   return score;
 }
 
-function maxSpanFor(remainingMora: number): number {
-  return Math.min(atejiIndex.maxMoraLength, remainingMora);
+function maxSpanFor(index: AtejiIndex, remainingMora: number): number {
+  return Math.min(index.maxMoraLength, remainingMora);
 }
 
-function candidatesForSpan(moraSlice: string[]): AtejiIndexCandidate[] {
+function candidatesForSpan(index: AtejiIndex, moraSlice: string[]): AtejiIndexCandidate[] {
   const key = moraSlice.join('');
-  return atejiIndex.readings[key] ?? [];
+  return index.readings[key] ?? [];
 }
 
 /**
@@ -111,21 +125,13 @@ function candidatesForSpan(moraSlice: string[]): AtejiIndexCandidate[] {
  * chose automatically, without having to accept or reject an entire
  * alternate name combination.
  */
-export function candidatesForReading(moraSlice: string[]): AtejiIndexCandidate[] {
-  return candidatesForSpan(moraSlice);
+export async function candidatesForReading(moraSlice: string[]): Promise<AtejiIndexCandidate[]> {
+  const index = await loadAtejiIndex();
+  return candidatesForSpan(index, moraSlice);
 }
 
-/**
- * Generates ranked ateji (sound-based kanji) candidate combinations for a
- * katakana name, covering every mora with either a matched kanji or an
- * explicit "no clean kanji" gap (rendered as bare katakana for that mora).
- *
- * Uses variable-length mora spans (1 kanji can cover 1-N mora, N derived
- * from the built index — see build-ateji-index.mjs) rather than a fixed
- * 1-2 mora window, so curated 3-4 mora kun readings like 光=hikaru are not
- * silently excluded.
- */
-export function generateAtejiCandidates(
+function generateAtejiCandidatesSync(
+  index: AtejiIndex,
   katakanaName: string,
   maxResults = 8,
   moraPenaltyPoints: number[] = [],
@@ -140,7 +146,7 @@ export function generateAtejiCandidates(
   for (let end = 1; end <= mora.length; end++) {
     const extensions: PartialPath[] = [];
 
-    for (let len = 1; len <= maxSpanFor(end); len++) {
+    for (let len = 1; len <= maxSpanFor(index, end); len++) {
       const start = end - len;
       const prefixBeam = beams[start];
       if (prefixBeam.length === 0) continue;
@@ -153,7 +159,7 @@ export function generateAtejiCandidates(
         0,
         100 - moraPenaltyPoints.slice(start, end).reduce((sum, points) => sum + points, 0),
       );
-      const candidates = candidatesForSpan(moraSlice).slice(0, CANDIDATES_PER_SPAN);
+      const candidates = candidatesForSpan(index, moraSlice).slice(0, CANDIDATES_PER_SPAN);
 
       const spanOptions: AtejiSpan[] =
         candidates.length > 0
@@ -217,6 +223,25 @@ export function generateAtejiCandidates(
   }
 
   return unique.slice(0, maxResults);
+}
+
+/**
+ * Generates ranked ateji (sound-based kanji) candidate combinations for a
+ * katakana name, covering every mora with either a matched kanji or an
+ * explicit "no clean kanji" gap (rendered as bare katakana for that mora).
+ *
+ * Uses variable-length mora spans (1 kanji can cover 1-N mora, N derived
+ * from the built index — see build-ateji-index.mjs) rather than a fixed
+ * 1-2 mora window, so curated 3-4 mora kun readings like 光=hikaru are not
+ * silently excluded.
+ */
+export async function generateAtejiCandidates(
+  katakanaName: string,
+  maxResults = 8,
+  moraPenaltyPoints: number[] = [],
+): Promise<AtejiCombo[]> {
+  const index = await loadAtejiIndex();
+  return generateAtejiCandidatesSync(index, katakanaName, maxResults, moraPenaltyPoints);
 }
 
 /**

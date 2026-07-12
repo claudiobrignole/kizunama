@@ -344,8 +344,8 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .mg-btn--red:hover { color: #fff; }
 .mg-btn--ink { background: var(--ln-ink); color: var(--ln-cream); border-color: #fff; }
 .mg-btn--ink:hover { color: var(--ln-cream); }
-.mg-btn--yellow { background: var(--ln-red); color: #fff; border-color: #fff; }
-.mg-btn--yellow:hover { color: #fff; }
+.mg-btn--yellow { background: var(--ln-yellow); color: var(--ln-ink); border-color: var(--ln-ink); }
+.mg-btn--yellow:hover { color: var(--ln-ink); }
 .mg-btn--purple { background: var(--ln-purple); color: #fff; border-color: #fff; }
 .mg-btn--purple:hover { color: #fff; }
 

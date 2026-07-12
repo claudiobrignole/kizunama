@@ -14,6 +14,21 @@ describe('nameToKatakana', () => {
     expect(result.katakana).toBe('クラウディオ');
   });
 
+  it('applies language-specific validated readings when EN and IT differ', async () => {
+    const en = await nameToKatakana('Laura', 'en');
+    const it = await nameToKatakana('Laura', 'it');
+    expect(en.tier).toBe('validated');
+    expect(it.tier).toBe('validated');
+    expect(en.katakana).toBe('ローラ');
+    expect(it.katakana).toBe('ラウラ');
+  });
+
+  it('uses newly validated English entries from the production dictionary', async () => {
+    const result = await nameToKatakana('Aaliyah', 'en');
+    expect(result.tier).toBe('validated');
+    expect(result.katakana).toBe('アリーヤ');
+  });
+
   it('uses ENAMDICT after the curated dictionary', async () => {
     const result = await nameToKatakana('Abbado', 'it');
     expect(result.tier).toBe('conventional');

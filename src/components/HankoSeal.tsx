@@ -6,13 +6,14 @@ import {
   isFontFreeHankoSvg,
   type HankoOptions,
 } from '../utils/hanko';
-import { loadHankoOutlineFont } from '../utils/hankoFont';
 import { useI18n } from '../i18n/context';
 
 interface HankoSealProps {
   chars: string[];
   shape?: HankoOptions['shape'];
   orientation?: HankoOptions['orientation'];
+  /** Opens the social share dialog (PNG story/post/square). */
+  onShare?: () => void;
 }
 
 function triggerDownload(svg: string, filename: string) {
@@ -50,7 +51,7 @@ async function copyText(text: string): Promise<void> {
   ta.remove();
 }
 
-export function HankoSeal({ chars, shape, orientation }: HankoSealProps) {
+export function HankoSeal({ chars, shape, orientation, onShare }: HankoSealProps) {
   const { messages } = useI18n();
   const [copied, setCopied] = useState(false);
   const [fontReady, setFontReady] = useState(false);
@@ -74,6 +75,7 @@ export function HankoSeal({ chars, shape, orientation }: HankoSealProps) {
 
     void (async () => {
       try {
+        const { loadHankoOutlineFont } = await import('../utils/hankoFont');
         const font = await loadHankoOutlineFont(charsToLoad);
         if (cancelled) return;
         fontRef.current = font;
@@ -160,6 +162,16 @@ export function HankoSeal({ chars, shape, orientation }: HankoSealProps) {
         <div className="kz-hanko-svg-wrap" dangerouslySetInnerHTML={{ __html: previewSvg }} />
       </div>
       <div className="kz-hanko-actions">
+        {onShare && (
+          <button
+            type="button"
+            className="mg-btn mg-btn--yellow kz-share-btn"
+            onClick={onShare}
+            disabled={chars.length === 0}
+          >
+            {messages.share.button}
+          </button>
+        )}
         <button
           type="button"
           className="mg-btn mg-btn--red"

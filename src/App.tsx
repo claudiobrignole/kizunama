@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { NameKatakana } from './components/NameKatakana';
 import { AtejiCandidates } from './components/AtejiCandidates';
 import { SeimeiHandanView } from './components/SeimeiHandanView';
-import { HankoSeal } from './components/HankoSeal';
 import { OrderHelper } from './components/OrderHelper';
+import { ShareDialog } from './components/ShareDialog';
 import { SiteFooter } from './components/SiteFooter';
 import { LunaSponsorStrip } from './components/LunaSponsorStrip';
 import { InstallPrompt } from './components/InstallPrompt';
@@ -11,35 +11,107 @@ import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { LanguageBanner } from './components/LanguageBanner';
 import { HelpDialog, type HelpTopic } from './components/HelpDialog';
 import { useI18n } from './i18n/context';
-import { applyAtejiOverrides, generateAtejiCandidates, type AtejiIndexCandidate, type AtejiSpan } from './utils/ateji';
+import {
+  applyAtejiOverrides,
+  generateAtejiCandidates,
+  prefetchAtejiIndex,
+  type AtejiCombo,
+  type AtejiIndexCandidate,
+  type AtejiSpan,
+} from './utils/ateji';
+import {
+  nameToKatakana,
+  prefetchJmnedictNames,
+  type KatakanaLanguage,
+  type KatakanaResult,
+} from './utils/katakana';
+import { parseNameQuery, syncNameQueryToUrl } from './utils/nameQuery';
 import { computeSeimeiHandan } from './utils/seimeiHandan';
-import type { KatakanaLanguage, KatakanaResult } from './utils/katakana';
+
+const HankoSeal = lazy(() =>
+  import('./components/HankoSeal').then((mod) => ({ default: mod.HankoSeal })),
+);
 
 function spanChar(span: AtejiSpan): string {
   return span.kanji ?? span.mora.join('');
+}
+
+function scheduleIdle(cb: () => void): () => void {
+  if (typeof requestIdleCallback === 'function') {
+    const id = requestIdleCallback(cb);
+    return () => cancelIdleCallback(id);
+  }
+  const id = window.setTimeout(cb, 1);
+  return () => clearTimeout(id);
 }
 
 function App() {
   const { messages, locale } = useI18n();
   const [helpTopic, setHelpTopic] = useState<HelpTopic | null>(null);
   const [lang, setLang] = useState<KatakanaLanguage>(locale);
+  const initialNames = useRef(
+    parseNameQuery(typeof window === 'undefined' ? '' : window.location.search),
+  ).current;
 
   // Keep the phonetic-engine selector aligned with the UI language.
   useEffect(() => {
     setLang(locale);
   }, [locale]);
 
-  const [givenName, setGivenName] = useState('');
+  // Prefetch large data chunks after first paint so submit rarely waits.
+  useEffect(() => {
+    return scheduleIdle(() => {
+      prefetchJmnedictNames();
+      prefetchAtejiIndex();
+    });
+  }, []);
+
+  const [givenName, setGivenName] = useState(initialNames.given);
   const [givenResult, setGivenResult] = useState<KatakanaResult | null>(null);
   const [selectedGivenIdx, setSelectedGivenIdx] = useState(0);
   const [givenOverrides, setGivenOverrides] = useState<Record<string, AtejiIndexCandidate>>({});
 
-  const [surname, setSurname] = useState('');
+  const [surname, setSurname] = useState(initialNames.surname);
   const [surnameResult, setSurnameResult] = useState<KatakanaResult | null>(null);
   const [selectedSurnameIdx, setSelectedSurnameIdx] = useState(0);
   const [surnameOverrides, setSurnameOverrides] = useState<Record<string, AtejiIndexCandidate>>({});
 
+  const [givenCombos, setGivenCombos] = useState<AtejiCombo[]>([]);
+  const [surnameCombos, setSurnameCombos] = useState<AtejiCombo[]>([]);
+  const [atejiLoading, setAtejiLoading] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+
   const [orderName, setOrderName] = useState('');
+
+  // Restore a shared ?n=/&s= result and convert both fields on first boot.
+  useEffect(() => {
+    if (!initialNames.given && !initialNames.surname) return;
+    let cancelled = false;
+
+    // Normalize away disallowed / overlong query input without a reload.
+    syncNameQueryToUrl(initialNames, locale);
+
+    void (async () => {
+      const [nextGiven, nextSurname] = await Promise.all([
+        initialNames.given
+          ? nameToKatakana(initialNames.given, lang)
+          : Promise.resolve<KatakanaResult | null>(null),
+        initialNames.surname
+          ? nameToKatakana(initialNames.surname, lang)
+          : Promise.resolve<KatakanaResult | null>(null),
+      ]);
+      if (cancelled) return;
+      setGivenResult(nextGiven);
+      setSurnameResult(nextSurname);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // This is intentionally a boot-only restore. Strict Mode's second setup
+    // still runs because no one-shot ref suppresses it after the first cleanup.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (orderName) return;
@@ -51,26 +123,56 @@ function App() {
     setGivenResult(result);
     setSelectedGivenIdx(0);
     setGivenOverrides({});
+    if (result) {
+      syncNameQueryToUrl(
+        { given: givenName, surname: surnameResult ? surname : '' },
+        locale,
+      );
+    }
   };
 
   const handleSurnameResult = (result: KatakanaResult | null) => {
     setSurnameResult(result);
     setSelectedSurnameIdx(0);
     setSurnameOverrides({});
+    if (result) {
+      syncNameQueryToUrl(
+        { given: givenResult ? givenName : '', surname },
+        locale,
+      );
+    }
   };
 
-  const givenCombos = useMemo(
-    () => (givenResult?.katakana
-      ? generateAtejiCandidates(givenResult.katakana, 8, givenResult.moraPenaltyPoints)
-      : []),
-    [givenResult],
-  );
-  const surnameCombos = useMemo(
-    () => (surnameResult?.katakana
-      ? generateAtejiCandidates(surnameResult.katakana, 8, surnameResult.moraPenaltyPoints)
-      : []),
-    [surnameResult],
-  );
+  useEffect(() => {
+    let cancelled = false;
+    const givenKana = givenResult?.katakana ?? '';
+    const surnameKana = surnameResult?.katakana ?? '';
+
+    if (!givenKana && !surnameKana) {
+      setGivenCombos([]);
+      setSurnameCombos([]);
+      setAtejiLoading(false);
+      return;
+    }
+
+    setAtejiLoading(true);
+    void (async () => {
+      const [nextGiven, nextSurname] = await Promise.all([
+        givenKana ? generateAtejiCandidates(givenKana, 8, givenResult?.moraPenaltyPoints) : Promise.resolve([]),
+        surnameKana
+          ? generateAtejiCandidates(surnameKana, 8, surnameResult?.moraPenaltyPoints)
+          : Promise.resolve([]),
+      ]);
+      if (cancelled) return;
+      setGivenCombos(nextGiven);
+      setSurnameCombos(nextSurname);
+      setAtejiLoading(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [givenResult, surnameResult]);
 
   const givenSpans = useMemo(() => {
     if (givenCombos.length === 0) return [];
@@ -104,6 +206,13 @@ function App() {
   }, [hasAnyAtejiKanji, surnameSpans, givenSpans, surnameResult, givenResult]);
 
   const hankoOrientation = hasAnyAtejiKanji ? 'vertical-columns' : 'horizontal';
+
+  const shareOriginalName = [givenName, surname].filter(Boolean).join(' ').trim() || orderName;
+  const shareKatakana = [surnameResult?.katakana, givenResult?.katakana].filter(Boolean).join('　');
+  const shareDisplayJa = hasAnyAtejiKanji
+    ? [...surnameSpans.map(spanChar), ...givenSpans.map(spanChar)].join('')
+    : shareKatakana;
+  const canShare = hankoChars.length > 0;
 
   return (
     <div className="mg-landing kz-landing">
@@ -200,26 +309,42 @@ function App() {
             <p className="kz-band-sub">{messages.band2.subtitle}</p>
 
             <div className="mg-card kz-tool-card">
-              {surname.trim() && (
-                <AtejiCandidates
-                  heading={messages.atejiCandidates.surnameHeading}
-                  combos={surnameCombos}
-                  selectedIndex={selectedSurnameIdx}
-                  onSelectCombo={setSelectedSurnameIdx}
-                  overrides={surnameOverrides}
-                  onOverride={(key, candidate) => setSurnameOverrides((prev) => ({ ...prev, [key]: candidate }))}
-                  showDisclaimer={surnameCombos.length > 0}
-                />
+              {atejiLoading ? (
+                <p className="kz-empty-hint" role="status" aria-live="polite">
+                  {messages.atejiCandidates.loading}
+                </p>
+              ) : (
+                <>
+                  {surname.trim() && (
+                    <AtejiCandidates
+                      heading={messages.atejiCandidates.surnameHeading}
+                      combos={surnameCombos}
+                      selectedIndex={selectedSurnameIdx}
+                      onSelectCombo={setSelectedSurnameIdx}
+                      overrides={surnameOverrides}
+                      onOverride={(key, candidate) => setSurnameOverrides((prev) => ({ ...prev, [key]: candidate }))}
+                      showDisclaimer={surnameCombos.length > 0}
+                    />
+                  )}
+                  <AtejiCandidates
+                    heading={surname.trim() ? messages.atejiCandidates.givenNameHeading : undefined}
+                    combos={givenCombos}
+                    selectedIndex={selectedGivenIdx}
+                    onSelectCombo={setSelectedGivenIdx}
+                    overrides={givenOverrides}
+                    onOverride={(key, candidate) => setGivenOverrides((prev) => ({ ...prev, [key]: candidate }))}
+                    showDisclaimer={surnameCombos.length === 0}
+                  />
+                  {canShare && (
+                    <div className="kz-share-launch">
+                      <p className="kz-share-launch__hint">{messages.share.earlyHint}</p>
+                      <button type="button" className="mg-btn mg-btn--yellow kz-share-btn" onClick={() => setShareOpen(true)}>
+                        {messages.share.button}
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
-              <AtejiCandidates
-                heading={surname.trim() ? messages.atejiCandidates.givenNameHeading : undefined}
-                combos={givenCombos}
-                selectedIndex={selectedGivenIdx}
-                onSelectCombo={setSelectedGivenIdx}
-                overrides={givenOverrides}
-                onOverride={(key, candidate) => setGivenOverrides((prev) => ({ ...prev, [key]: candidate }))}
-                showDisclaimer={surnameCombos.length === 0}
-              />
             </div>
           </div>
         </div>
@@ -273,7 +398,13 @@ function App() {
             <p className="kz-band-sub">{messages.band4.subtitle}</p>
 
             <div className="mg-card kz-tool-card">
-              <HankoSeal chars={hankoChars} orientation={hankoOrientation} />
+              <Suspense fallback={<p className="kz-empty-hint" role="status">{messages.hankoSeal.downloadPreparing}</p>}>
+                <HankoSeal
+                  chars={hankoChars}
+                  orientation={hankoOrientation}
+                  onShare={canShare ? () => setShareOpen(true) : undefined}
+                />
+              </Suspense>
               <div className="kz-field-block">
                 <input
                   className="lnx-input"
@@ -295,6 +426,17 @@ function App() {
       <SiteFooter onOpenHelp={() => setHelpTopic('overview')} />
       <InstallPrompt />
       <HelpDialog topic={helpTopic} onClose={() => setHelpTopic(null)} />
+      <ShareDialog
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        givenName={givenName}
+        surname={surnameResult ? surname : ''}
+        originalName={shareOriginalName}
+        katakana={shareKatakana}
+        displayJa={shareDisplayJa}
+        hankoChars={hankoChars}
+        hankoOrientation={hankoOrientation}
+      />
     </div>
   );
 }

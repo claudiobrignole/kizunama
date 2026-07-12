@@ -1,4 +1,4 @@
-import { SPONSOR_URL } from '../config';
+import { lunaNihongoUrl } from '../config';
 import { useI18n } from '../i18n/context';
 
 /**
@@ -17,7 +17,12 @@ export function LunaSponsorStrip() {
           alt="Luna Nihongo"
           height={36}
         />
-        <a className="mg-btn mg-btn--red kz-luna-strip__cta" href={SPONSOR_URL} target="_blank" rel="noopener noreferrer">
+        <a
+          className="mg-btn mg-btn--red kz-luna-strip__cta"
+          href={lunaNihongoUrl('footer')}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {messages.footer.sponsorCta}
         </a>
         <img

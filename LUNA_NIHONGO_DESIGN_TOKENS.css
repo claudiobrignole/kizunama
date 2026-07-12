@@ -342,7 +342,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .mg-btn:focus-visible { outline: 3px solid var(--ln-yellow); outline-offset: 2px; }
 .mg-btn--red { background: var(--ln-red); color: #fff; border-color: #fff; }
 .mg-btn--ink { background: var(--ln-ink); color: var(--ln-cream); border-color: #fff; }
-.mg-btn--yellow { background: var(--ln-red); color: #fff; border-color: #fff; }
+.mg-btn--yellow { background: var(--ln-yellow); color: var(--ln-ink); border-color: var(--ln-ink); }
 .mg-btn--purple { background: var(--ln-purple); color: #fff; border-color: #fff; }
 
 .mg-card { background: #fff; color: var(--ln-ink); border: 2px solid var(--ln-ink); border-radius: 10px; box-shadow: 6px 6px 0 var(--ln-shadow); padding: 1.15rem 1.3rem; }

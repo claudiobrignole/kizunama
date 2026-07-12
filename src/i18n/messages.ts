@@ -56,6 +56,7 @@ export interface Messages {
   };
   atejiCandidates: {
     emptyHint: string;
+    loading: string;
     comboLabel: string;
     unmatchedBadge: string;
     unmatchedNote: string;
@@ -116,6 +117,33 @@ export interface Messages {
     copy: string;
     copied: string;
     disclaimer: string;
+  };
+  share: {
+    button: string;
+    earlyHint: string;
+    title: string;
+    formatLegend: string;
+    formatStory: string;
+    formatPost: string;
+    formatSquare: string;
+    preparing: string;
+    previewAlt: string;
+    shareNative: string;
+    shareNativeHint: string;
+    shareNativeUnavailable: string;
+    downloadPng: string;
+    instagram: string;
+    instagramHint: string;
+    socialLegend: string;
+    shareTitle: string;
+    close: string;
+    linkLabel: string;
+    linkCopy: string;
+    linkCopied: string;
+    tagline: string;
+    errorFont: string;
+    errorGeneric: string;
+    errorCopy: string;
   };
   nameOrderField: {
     placeholder: string;

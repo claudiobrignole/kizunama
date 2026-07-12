@@ -321,6 +321,203 @@
   width: 100%;
 }
 
+/* Share dialog */
+.kz-share-launch {
+  margin: 1.1rem 0 0.15rem;
+  padding-top: 1rem;
+  border-top: var(--border-hairline);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  text-align: center;
+}
+
+.kz-share-launch__hint {
+  margin: 0;
+  max-width: 28rem;
+  font-size: calc(0.88rem / var(--ln-body-text-scale));
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.kz-share-btn {
+  min-width: min(100%, 16rem);
+}
+
+.kz-share-dialog {
+  max-width: 440px;
+  width: 100%;
+  max-height: min(90vh, 720px);
+  overflow-y: auto;
+  padding: 1.35rem;
+}
+
+.kz-share-dialog__title {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 1.15rem;
+  margin: 0 0 0.9rem;
+  color: var(--ln-ink);
+}
+
+.kz-share-dialog__formats {
+  border: 2px solid var(--ln-ink);
+  border-radius: var(--radius-md, 10px);
+  padding: 0.65rem 0.75rem 0.75rem;
+  margin: 0 0 0.9rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.kz-share-dialog__legend {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  padding: 0 0.25rem;
+}
+
+.kz-share-format {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.55rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.kz-share-format input {
+  accent-color: var(--ln-red);
+}
+
+.kz-share-format span {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--ln-ink);
+}
+
+.kz-share-format small {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.kz-share-format--active {
+  border-color: var(--ln-ink);
+  background: var(--ln-yellow);
+  box-shadow: 3px 3px 0 var(--ln-shadow);
+}
+
+.kz-share-dialog__preview {
+  min-height: 160px;
+  margin-bottom: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--ln-washi);
+  border: 2px solid var(--ln-ink);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
+.kz-share-dialog__preview-img {
+  max-width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  display: block;
+}
+
+.kz-share-dialog__error {
+  margin: 0;
+  padding: 0.75rem;
+  color: var(--ln-red-deep);
+  font-weight: 600;
+  text-align: center;
+}
+
+.kz-share-dialog__social {
+  margin-bottom: 1rem;
+}
+
+.kz-share-dialog__social-label {
+  margin: 0 0 0.45rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.kz-share-dialog__social-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.kz-share-dialog__social-grid .mg-btn {
+  flex: 1 1 8.5rem;
+}
+
+.kz-share-dialog__social-hint {
+  margin: 0.55rem 0 0;
+  font-size: calc(0.8rem / var(--ln-body-text-scale));
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.kz-share-dialog__instagram-note {
+  margin-top: 0.65rem;
+  padding: 0.7rem 0.8rem;
+  border: 2px solid var(--ln-ink);
+  border-left: 6px solid var(--ln-red);
+  background: var(--ln-yellow);
+  box-shadow: 3px 3px 0 var(--ln-shadow);
+  font-size: calc(0.84rem / var(--ln-body-text-scale));
+  line-height: 1.45;
+  color: var(--ln-ink);
+}
+
+.kz-share-dialog__link {
+  margin-bottom: 1rem;
+}
+
+.kz-share-dialog__link-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.kz-share-dialog__link-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.kz-share-dialog__link-row .lnx-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.kz-share-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: flex-end;
+}
+
+.kz-share-dialog__actions .mg-btn {
+  min-width: 7rem;
+}
+
+
 .kz-footer-logo {
   display: inline-block;
   line-height: 0;
@@ -626,11 +823,16 @@
 .kz-transliteration-warning,
 .kz-ateji-disclaimer {
   margin: 0.75rem 0 0;
-  padding: 0.65rem 0.8rem;
-  border: 2px solid var(--ln-red-deep);
-  background: #fde8ec;
-  color: var(--ln-red-deep);
-  font-weight: 700;
+  padding: 0.7rem 0.85rem;
+  border: 2px solid var(--ln-ink);
+  border-left: 0.45rem solid var(--ln-red);
+  border-radius: var(--radius-input);
+  background: color-mix(in srgb, var(--ln-yellow) 18%, var(--ln-card-bg));
+  color: var(--ln-ink);
+  box-shadow: 3px 3px 0 var(--ln-shadow);
+  font-size: calc(0.78rem / var(--ln-body-text-scale));
+  font-weight: 600;
+  line-height: 1.5;
 }
 
 .kz-ateji-disclaimer {

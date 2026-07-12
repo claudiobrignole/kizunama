@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kizunama-v5';
+const CACHE_NAME = 'kizunama-v6';
 const CORE_ASSETS = [
   '/',
   '/en/',
@@ -10,6 +10,9 @@ const CORE_ASSETS = [
   '/icons/favicon-32.png',
   '/fonts/NotoSerifJP-Bold.woff',
 ];
+
+// Hashed Vite chunks (including lazy atejiIndex / jmnedictNames JSON) are not
+// listed here: the fetch handler below caches them at runtime (cache-first).
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

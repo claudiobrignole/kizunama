@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { applyAtejiOverrides, candidatesForReading, type AtejiCombo, type AtejiIndexCandidate } from '../utils/ateji';
 import { useI18n } from '../i18n/context';
 
@@ -38,6 +38,33 @@ export function AtejiCandidates({
   const { messages, locale } = useI18n();
   const t = messages.atejiCandidates;
   const [openSwapKey, setOpenSwapKey] = useState<string | null>(null);
+  const [altsByMora, setAltsByMora] = useState<Record<string, AtejiIndexCandidate[]>>({});
+
+  const selectedCombo = combos.length > 0 ? combos[Math.min(selectedIndex, combos.length - 1)] : null;
+  const renderedSpans = selectedCombo ? applyAtejiOverrides(selectedCombo.spans, overrides) : [];
+
+  useEffect(() => {
+    if (!allowSwap || !selectedCombo) {
+      setAltsByMora({});
+      return;
+    }
+    let cancelled = false;
+    const spansWithKanji = selectedCombo.spans.filter((span) => span.kanji);
+    void (async () => {
+      const entries = await Promise.all(
+        spansWithKanji.map(async (span) => {
+          const key = span.mora.join('');
+          const alts = await candidatesForReading(span.mora);
+          return [key, alts] as const;
+        }),
+      );
+      if (cancelled) return;
+      setAltsByMora(Object.fromEntries(entries));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [allowSwap, selectedCombo]);
 
   if (combos.length === 0) {
     return (
@@ -47,9 +74,6 @@ export function AtejiCandidates({
       </div>
     );
   }
-
-  const selectedCombo = combos[Math.min(selectedIndex, combos.length - 1)];
-  const renderedSpans = applyAtejiOverrides(selectedCombo.spans, overrides);
 
   return (
     <div className="kz-ateji-block">
@@ -87,7 +111,7 @@ export function AtejiCandidates({
         {renderedSpans.map((span, i) => {
           const moraKey = span.mora.join('');
           const isOpen = openSwapKey === moraKey;
-          const alternates = allowSwap && span.kanji ? candidatesForReading(span.mora) : [];
+          const alternates = allowSwap && span.kanji ? (altsByMora[moraKey] ?? []) : [];
 
           return (
             <div className={`kz-ateji-slot${span.kanji ? '' : ' kz-ateji-slot--unmatched'}`} key={`${moraKey}-${i}`}>
@@ -136,7 +160,8 @@ export function AtejiCandidates({
                           >
                             <span className="kz-ateji-swap-option__char">{candidate.char}</span>
                             <span className="kz-ateji-swap-option__meta">
-                              {readingTypeLabel(candidate.readingType, t)} · {candidate.strokeCount ?? '?'} {t.strokesLabel}
+                              {readingTypeLabel(candidate.readingType, t)} · {candidate.strokeCount ?? '?'}{' '}
+                              {t.strokesLabel}
                             </span>
                           </button>
                         ))}

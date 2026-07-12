@@ -1,6 +1,5 @@
 import * as wanakana from 'wanakana';
 import nameDict from '../data/nameKatakanaDict.json';
-import conventionalNamesData from '../data/jmnedictNames.json';
 import { ipaToKatakana } from './ipaToKatakana';
 import { approximatePronunciation, type PhoneticLanguage } from './languagePhonetics';
 import { moraSegment } from './mora';
@@ -19,11 +18,36 @@ export interface KatakanaResult {
   moraPenaltyPoints?: number[];
 }
 
+type ConventionalEntry = { k: string; a?: string[] };
+
 const { _meta: _dictMeta, ...dict } = nameDict as unknown as Record<string, string> & { _meta: unknown };
-const conventionalNames = conventionalNamesData as Record<string, { k: string; a?: string[] }>;
+
+/** Cached load of the ENAMDICT conventional-name index (own Vite chunk). */
+let conventionalNamesPromise: Promise<Record<string, ConventionalEntry>> | null = null;
+
+export function loadJmnedictNames(): Promise<Record<string, ConventionalEntry>> {
+  if (!conventionalNamesPromise) {
+    conventionalNamesPromise = import('../data/jmnedictNames.json').then(
+      (mod) => mod.default as Record<string, ConventionalEntry>,
+    );
+  }
+  return conventionalNamesPromise;
+}
+
+/** Warm the JMnedict chunk during idle time after first paint. */
+export function prefetchJmnedictNames(): void {
+  void loadJmnedictNames();
+}
 
 function normalizeKey(input: string): string {
   return input.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z]/g, '');
+}
+
+/** Tier-1 lookup: prefer `name@lang` when EN/IT readings differ, else `name`. */
+function lookupValidated(key: string, lang: KatakanaLanguage): string | undefined {
+  const localized = dict[`${key}@${lang}`];
+  if (localized) return localized;
+  return dict[key];
 }
 
 function penaltiesByMora(outputRomaji: string, katakana: string, penalties: EpenthesisPenalty[]): number[] {
@@ -65,10 +89,14 @@ export async function nameToKatakana(name: string, lang: KatakanaLanguage = 'en'
   if (!trimmed) return { katakana: '', method: 'fallback', tier: 'approximate' };
 
   const key = normalizeKey(trimmed);
-  if (dict[key]) {
-    return { katakana: dict[key], method: 'dictionary', tier: 'validated' };
+  // Tier 1 — curated dict (static, small): never wait on the lazy index.
+  const validated = lookupValidated(key, lang);
+  if (validated) {
+    return { katakana: validated, method: 'dictionary', tier: 'validated' };
   }
 
+  // Tier 2 — ENAMDICT conventional names (lazy chunk), only after tier 1 miss.
+  const conventionalNames = await loadJmnedictNames();
   const conventional = conventionalNames[key];
   if (conventional) {
     return {
