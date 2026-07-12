@@ -214,7 +214,7 @@ const it = {
     },
   },
   install: {
-    text: 'Installa キズナマ KIZUNAMA come app per un accesso rapido.',
+    text: 'Installa KIZUNAMA come app per un accesso rapido.',
     install: 'Installa',
     dismiss: 'Non ora',
   },

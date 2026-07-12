@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Builds Kizunama PWA icons: full-bleed Luna red, white Bricolage "K" +
- * "KIZUNAMA" wordmark. Glyphs are outlined so PNG/SVG output does not depend
- * on fonts installed on the machine that opens them.
+ * Builds Kizunama PWA icons: full-bleed Luna red with a centred white
+ * Bricolage "K". Glyphs are outlined so PNG/SVG output does not depend on
+ * fonts installed on the machine that opens them.
  */
 import sharp from 'sharp';
 import opentype from 'opentype.js';
@@ -19,7 +19,7 @@ const FONT_FILE = path.join(__dirname, 'fonts/BricolageGrotesque-ExtraBold.ttf')
 const BG = '#d6304a'; // --ln-red
 const FG = '#ffffff';
 const SIZE = 1024;
-/** Maskable safe zone is the centre 80% — keep marks inside this inset. */
+/** Maskable safe zone is the centre 80% — keep the K inside this inset. */
 const SAFE = { min: SIZE * 0.12, max: SIZE * 0.88 };
 
 function loadFont() {
@@ -28,16 +28,16 @@ function loadFont() {
 }
 
 /** Build glyph outlines without OpenType GSUB (opentype.js chokes on this font's features). */
-function textPath(font, text, fontSize, letterSpacing = 0) {
+function textPath(font, text, fontSize) {
   let x = 0;
   const scale = fontSize / font.unitsPerEm;
   const commands = [];
   for (const ch of text) {
     const glyph = font.charToGlyph(ch);
     commands.push(...glyph.getPath(x, 0, fontSize).commands);
-    x += (glyph.advanceWidth || 0) * scale + letterSpacing;
+    x += (glyph.advanceWidth || 0) * scale;
   }
-  return { commands, width: Math.max(0, x - letterSpacing) };
+  return { commands, width: x };
 }
 
 function commandsToD(commands) {
@@ -54,24 +54,23 @@ function commandsToD(commands) {
 }
 
 function buildSvg(font, size) {
-  const k = textPath(font, 'K', 460);
-  const word = textPath(font, 'KIZUNAMA', 86, 4);
-
-  // Optical centre: K slightly above mid, wordmark in lower safe zone.
+  // Large centred K within the maskable safe zone.
+  const k = textPath(font, 'K', 620);
+  const bboxY0 = Math.min(...k.commands.filter((c) => 'y' in c).map((c) => c.y));
+  const bboxY1 = Math.max(...k.commands.filter((c) => 'y' in c).map((c) => c.y));
+  const kHeight = bboxY1 - bboxY0;
   const kX = (SIZE - k.width) / 2;
-  const kY = 560;
-  const wordX = (SIZE - word.width) / 2;
-  const wordY = 780;
+  // Optical vertical centre (path y grows downward from the baseline).
+  const kY = (SIZE - kHeight) / 2 - bboxY0;
 
-  if (kX < SAFE.min || kX + k.width > SAFE.max || wordX < SAFE.min || wordX + word.width > SAFE.max) {
-    console.warn('[icons] wordmark/K near maskable safe-zone edge — check layout');
+  if (kX < SAFE.min || kX + k.width > SAFE.max) {
+    console.warn('[icons] K near maskable safe-zone edge — check layout');
   }
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${SIZE} ${SIZE}" role="img" aria-label="KIZUNAMA">
   <rect width="100%" height="100%" fill="${BG}"/>
   <path fill="${FG}" transform="translate(${kX.toFixed(2)} ${kY.toFixed(2)})" d="${commandsToD(k.commands)}"/>
-  <path fill="${FG}" transform="translate(${wordX.toFixed(2)} ${wordY.toFixed(2)})" d="${commandsToD(word.commands)}"/>
 </svg>`;
 }
 

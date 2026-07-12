@@ -1,7 +1,7 @@
 {
-  "name": "キズナマ KIZUNAMA",
-  "short_name": "キズナマ",
-  "description": "キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji",
+  "name": "KIZUNAMA",
+  "short_name": "KIZUNAMA",
+  "description": "KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

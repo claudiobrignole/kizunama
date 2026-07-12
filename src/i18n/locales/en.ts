@@ -212,7 +212,7 @@ const en = {
     },
   },
   install: {
-    text: 'Install キズナマ KIZUNAMA as an app for quick access.',
+    text: 'Install KIZUNAMA as an app for quick access.',
     install: 'Install',
     dismiss: 'Not now',
   },
