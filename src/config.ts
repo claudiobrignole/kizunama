@@ -5,11 +5,11 @@
  */
 
 export const HANKO_AFFILIATE_URL: string =
-  import.meta.env.VITE_HANKO_AFFILIATE_URL || 'https://hankohub.com/';
+  import.meta.env?.VITE_HANKO_AFFILIATE_URL || 'https://hankohub.com/';
 
 export const LUNA_NIHONGO_ORIGIN = 'https://lunanihongo.com';
 
-export type LunaUtmCampaign = 'footer' | 'share';
+export type LunaUtmCampaign = 'footer' | 'share' | 'seo';
 
 /** Outbound Luna Nihongo URL with fixed UTM tagging (no analytics scripts). */
 export function lunaNihongoUrl(campaign: LunaUtmCampaign = 'footer'): string {

@@ -3,5 +3,5 @@
     "command": "npm ci && npm run build",
     "output": "dist"
   },
-  "note": "Static site, no runtime backend. In hPanel → Git → set Node 22+, output directory dist. Optional build env var: VITE_HANKO_AFFILIATE_URL."
+  "note": "Static site, no runtime backend. In hPanel → Git → set Node 22+ (needed for prerender --experimental-strip-types), output directory dist. Optional build env var: VITE_HANKO_AFFILIATE_URL."
 }

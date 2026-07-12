@@ -1,0 +1,26 @@
+# Kizunama (KIZUNAMA / 絆名)
+
+Kizunama is a free static web tool that turns a foreign given name into a Japanese presentation:
+Katakana sound spelling, phonetic ateji Kanji choices, a seimei handan stroke-count reading,
+and a decorative Hanko seal preview. No account, no AI generation of names.
+
+## Locales
+
+- Italian (default): https://kizunama.com/
+- English: https://kizunama.com/en/
+
+## What it is not
+
+Results are playful phonetic ateji (当て字), not real Japanese personal names and not suitable
+for koseki registration or as an official jitsuin seal.
+
+## Data sources
+
+- Kanji readings, stroke counts, and meanings: KANJIDIC2
+- Conventional foreign-name Katakana spellings: ENAMDICT / JMnedict
+- Licence: Electronic Dictionary Research and Development Group (EDRDG)
+
+## Publisher
+
+Made by Brignole — https://brignole.ch
+Japanese learning sponsor: https://lunanihongo.com

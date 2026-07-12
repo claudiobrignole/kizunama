@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && node scripts/prerender.mjs",
+    "build": "tsc -b && vite build && node --experimental-strip-types scripts/prerender.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
@@ -13,7 +13,7 @@
     "data:ateji:it": "node scripts/build-ateji-meanings-it.mjs",
     "data:names": "node scripts/build-name-dictionary.mjs",
     "build:icons": "node scripts/build-icons.mjs",
-    "prerender": "node scripts/prerender.mjs"
+    "prerender": "node --experimental-strip-types scripts/prerender.mjs"
   },
   "dependencies": {
     "opentype.js": "^2.0.0",

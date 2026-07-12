@@ -222,7 +222,12 @@ function App() {
         <div className="ln-header-inner">
           <div className="kz-header-main">
             <div className="kz-brand-lockup">
-              <span className="kz-brand-lockup__name">KIZUNAMA</span>
+              <span className="kz-brand-lockup__name">
+                <span className="kz-brand-lockup__kanji" lang="ja">
+                  キズナマ
+                </span>{' '}
+                KIZUNAMA
+              </span>
             </div>
             <p className="kz-header-tagline">{messages.header.tagline}</p>
           </div>
