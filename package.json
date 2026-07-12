@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "data:ateji": "node scripts/build-ateji-index.mjs",
+    "data:ateji:it": "node scripts/build-ateji-meanings-it.mjs",
     "data:names": "node scripts/build-name-dictionary.mjs",
     "build:icons": "node scripts/build-icons.mjs",
     "prerender": "node scripts/prerender.mjs"

@@ -14,11 +14,10 @@ const en = {
     label: 'Language',
   },
   meta: {
-    title: '絆名 | KIZUNAMA — Turn your name into Katakana and Kanji',
-    description:
-      'Turn your name into a Japanese Katakana and Kanji name for free. Ateji matched by sound, seimei handan numerology, and a shareable Hanko seal. No AI, no account, install as an app.',
-    ogTitle: '絆名 | KIZUNAMA — Turn your name into Katakana and Kanji',
-    ogDescription: 'Turn your name into a Japanese Katakana and Kanji name. Free, no AI, no account.',
+    title: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
+    description: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
+    ogTitle: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
+    ogDescription: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
   },
   band1: {
     index: '01.SOUND',
@@ -213,12 +212,12 @@ const en = {
     },
   },
   install: {
-    text: 'Install 絆名 KIZUNAMA as an app for quick access.',
+    text: 'Install キズナマ KIZUNAMA as an app for quick access.',
     install: 'Install',
     dismiss: 'Not now',
   },
   footer: {
-    seo: 'Kizunama — a free tool to turn the sound of your name into ateji Kanji, calculate a seimei handan numerology score, and create a downloadable decorative Hanko seal. No AI, no account, works offline once installed. Kanji data from KANJIDIC2 (EDRDG licence).',
+    seo: 'キズナマ KIZUNAMA — Turn your name into a Japanese Katakana and Kanji name. Convert sound to Katakana, explore ateji Kanji, check seimei handan, make a Hanko, and share a social image (Story, Post, or Square). Free, no AI, no account. Kanji data from KANJIDIC2 and names from ENAMDICT/JMnedict (EDRDG licence).',
     credits: 'Made by',
     sourcesTitle: 'Sources & licences',
     sourcesBody:

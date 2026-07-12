@@ -11,25 +11,26 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 const SITE = 'https://kizunama.com';
+const OG_IMAGE = `${SITE}/icons/icon-512.png`;
 
 const META = {
   it: {
     lang: 'it',
     canonical: `${SITE}/`,
-    title: '絆名 | KIZUNAMA — Trasforma il tuo nome in Katakana e Kanji',
+    title: 'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
     description:
-      'Trasforma il tuo nome in un nome giapponese in Katakana e Kanji, gratis. Ateji scelti per il suono, numerologia seimei handan e un timbro Hanko condividibile. Nessuna AI, nessun account, installabile come app.',
-    ogTitle: '絆名 | KIZUNAMA — Trasforma il tuo nome in Katakana e Kanji',
-    ogDescription: 'Trasforma il tuo nome in Katakana e Kanji. Gratis, senza AI, senza account.',
+      'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
+    ogTitle: 'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
+    ogDescription:
+      'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
   },
   en: {
     lang: 'en',
     canonical: `${SITE}/en/`,
-    title: '絆名 | KIZUNAMA — Turn your name into Katakana and Kanji',
-    description:
-      'Turn your name into a Japanese Katakana and Kanji name for free. Ateji matched by sound, seimei handan numerology, and a shareable Hanko seal. No AI, no account, install as an app.',
-    ogTitle: '絆名 | KIZUNAMA — Turn your name into Katakana and Kanji',
-    ogDescription: 'Turn your name into a Japanese Katakana and Kanji name. Free, no AI, no account.',
+    title: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
+    description: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
+    ogTitle: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
+    ogDescription: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
   },
 };
 
@@ -75,6 +76,30 @@ function applyMeta(html, meta) {
   ensureMeta(
     /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i,
     `<meta property="og:description" content="${escapeAttr(meta.ogDescription)}" />`,
+  );
+  ensureMeta(
+    /<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i,
+    `<meta property="og:url" content="${escapeAttr(meta.canonical)}" />`,
+  );
+  ensureMeta(
+    /<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i,
+    `<meta property="og:image" content="${escapeAttr(OG_IMAGE)}" />`,
+  );
+  ensureMeta(
+    /<meta\s+property="og:image:alt"\s+content="[^"]*"\s*\/?>/i,
+    `<meta property="og:image:alt" content="キズナマ KIZUNAMA" />`,
+  );
+  ensureMeta(
+    /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i,
+    `<meta name="twitter:title" content="${escapeAttr(meta.ogTitle)}" />`,
+  );
+  ensureMeta(
+    /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i,
+    `<meta name="twitter:description" content="${escapeAttr(meta.ogDescription)}" />`,
+  );
+  ensureMeta(
+    /<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/i,
+    `<meta name="twitter:image" content="${escapeAttr(OG_IMAGE)}" />`,
   );
 
   // Drop any previous canonical / hreflang, then inject a fresh set.

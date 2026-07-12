@@ -26,7 +26,7 @@
  * pre-converted to JSON). Re-run with `npm run data:ateji` whenever the
  * boost/block lists change.
  */
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import * as wanakana from 'wanakana';
@@ -38,10 +38,20 @@ import kunAllowlist from '../src/data/atejiKunAllowlist.json' with { type: 'json
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = path.join(__dirname, '../src/data/atejiIndex.json');
+const MEANINGS_IT_CACHE = path.join(__dirname, '../src/data/atejiMeaningsIt.json');
 
 const boostSet = new Set(boostlist.chars);
 const blockSet = new Set(blocklist.chars);
 const kunAllowedSet = new Set([...boostlist.chars, ...kunAllowlist.chars]);
+
+/** Optional EN→IT gloss cache produced by `npm run data:ateji:it`. */
+let meaningsIt = {};
+try {
+  const cached = JSON.parse(readFileSync(MEANINGS_IT_CACHE, 'utf8'));
+  meaningsIt = cached.translations ?? {};
+} catch {
+  meaningsIt = {};
+}
 
 // Jōyō (taught in compulsory education, grade 1-8 in kanjidic2's scheme) +
 // jinmeiyō (grade 9-10, name-only characters) = the legally registrable pool.
@@ -89,9 +99,9 @@ for (const k of legalKanji) {
 
   const strokeCount = k.strokeCounts?.[0] ?? null;
   const meaningEn = (k.meanings?.en ?? []).slice(0, 3).join(', ');
-  // KANJIDIC2 does not provide Italian glosses. Until a licensed Italian
-  // source is added, retain the English primary gloss as the explicit fallback.
-  const meaningIt = meaningEn;
+  // Italian glosses come from the cached MT map (data:ateji:it). KANJIDIC2
+  // itself only ships English; fall back to EN when a phrase is uncached.
+  const meaningIt = meaningsIt[meaningEn] || meaningEn;
   const freq = typeof k.freq === 'number' ? k.freq : null;
   const grade = k.grade;
   const boosted = boostSet.has(k.literal);

@@ -14,11 +14,12 @@ const it = {
     label: 'Lingua',
   },
   meta: {
-    title: '絆名 | KIZUNAMA — Trasforma il tuo nome in Katakana e Kanji',
+    title: 'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
     description:
-      'Trasforma il tuo nome in un nome giapponese in Katakana e Kanji, gratis. Ateji scelti per il suono, numerologia seimei handan e un timbro Hanko condividibile. Nessuna AI, nessun account, installabile come app.',
-    ogTitle: '絆名 | KIZUNAMA — Trasforma il tuo nome in Katakana e Kanji',
-    ogDescription: 'Trasforma il tuo nome in Katakana e Kanji. Gratis, senza AI, senza account.',
+      'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
+    ogTitle: 'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
+    ogDescription:
+      'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
   },
   band1: {
     index: '01.SUONO',
@@ -65,7 +66,7 @@ const it = {
     swapTitle: 'Scegli un Kanji alternativo per questo suono',
     swapClose: 'Chiudi',
     strokesLabel: 'tratti',
-    meaningLabel: 'Significato (fonte inglese)',
+    meaningLabel: 'Significato',
     readingLabel: 'Lettura usata',
     phoneticFitLabel: 'Aderenza fonetica',
     freeAdaptation: 'adattamento libero',
@@ -213,12 +214,12 @@ const it = {
     },
   },
   install: {
-    text: 'Installa 絆名 KIZUNAMA come app per un accesso rapido.',
+    text: 'Installa キズナマ KIZUNAMA come app per un accesso rapido.',
     install: 'Installa',
     dismiss: 'Non ora',
   },
   footer: {
-    seo: 'Kizunama — uno strumento gratuito per trasformare il suono del tuo nome in Kanji ateji, calcolare un punteggio numerologico di seimei handan e creare un timbro Hanko decorativo scaricabile. Nessuna AI, nessun account, funziona offline una volta installato. Dati Kanji da KANJIDIC2 (licenza EDRDG).',
+    seo: 'キズナマ KIZUNAMA — Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji. Converti il suono in Katakana, esplora Kanji ateji, consulta il seimei handan, crea un Hanko e condividi l’immagine sui social (Story, Post o Quadrato). Gratis, senza AI e senza account. Dati Kanji da KANJIDIC2 e nomi da ENAMDICT/JMnedict (licenza EDRDG).',
     credits: 'Realizzato da',
     sourcesTitle: 'Fonti e licenze',
     sourcesBody:
