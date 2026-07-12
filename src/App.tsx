@@ -115,11 +115,12 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Keep the order-assistant Latin name in sync with the name fields.
+  // (Previously we stopped after the first non-empty value, so typing
+  // "Claudio" left the field stuck on "C".)
   useEffect(() => {
-    if (orderName) return;
-    const combined = [surname, givenName].filter(Boolean).join(' ').trim();
-    if (combined) setOrderName(combined);
-  }, [givenName, surname, orderName]);
+    setOrderName([givenName, surname].filter(Boolean).join(' ').trim());
+  }, [givenName, surname]);
 
   const handleGivenResult = (result: KatakanaResult | null) => {
     setGivenResult(result);
