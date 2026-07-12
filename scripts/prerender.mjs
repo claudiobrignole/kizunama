@@ -195,6 +195,12 @@ function applyMeta(html, localeKey) {
     /<meta\s+property="og:locale"\s+content="[^"]*"\s*\/?>/i,
     `<meta property="og:locale" content="${ogLocale}" />`,
   );
+  // Point to the other locale (bilingual site).
+  const alternateOgLocale = localeKey === 'it' ? 'en_US' : 'it_IT';
+  ensureMeta(
+    /<meta\s+property="og:locale:alternate"\s+content="[^"]*"\s*\/?>/i,
+    `<meta property="og:locale:alternate" content="${alternateOgLocale}" />`,
+  );
   ensureMeta(
     /<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i,
     `<meta property="og:image" content="${escapeAttr(OG_IMAGE)}" />`,
@@ -241,6 +247,7 @@ function applyMeta(html, localeKey) {
   const headExtras = `
     <link rel="canonical" href="${canonical}" />
     ${HREFLANG}
+    <link rel="alternate" type="text/plain" title="LLM summary" href="${SITE}/llms.txt" />
     <script type="application/ld+json">${jsonLd}</script>`;
 
   out = out.replace(/<\/head>/i, `${headExtras}\n  </head>`);

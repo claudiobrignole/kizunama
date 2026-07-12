@@ -22,6 +22,7 @@ import {
 import {
   nameToKatakana,
   prefetchJmnedictNames,
+  prefetchPhonemizer,
   type KatakanaLanguage,
   type KatakanaResult,
 } from './utils/katakana';
@@ -63,6 +64,7 @@ function App() {
     return scheduleIdle(() => {
       prefetchJmnedictNames();
       prefetchAtejiIndex();
+      prefetchPhonemizer();
     });
   }, []);
 

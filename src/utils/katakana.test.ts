@@ -54,6 +54,21 @@ describe('nameToKatakana', () => {
     expect(result.katakana.length).toBeGreaterThan(0);
   }, 20000);
 
+  it('always finishes unknown English names even if the phonemizer stalls', async () => {
+    const started = Date.now();
+    const result = await nameToKatakana('Qxzvplmn', 'en');
+    expect(Date.now() - started).toBeLessThan(15_000);
+    expect(result.tier).toBe('approximate');
+    expect(result.katakana.length).toBeGreaterThan(0);
+  }, 20000);
+
+  it('times out a hanging promise via withTimeout', async () => {
+    const { __phonemizerTestUtils: utils } = await import('./katakana');
+    await expect(
+      utils.withTimeout(new Promise(() => undefined), 30, 'test'),
+    ).rejects.toThrow(/timed out/);
+  });
+
   // Reference outputs from the ateji-pivot research reports. Claudio is also
   // present in the curated dictionary; Klaudino exercises the rule-based
   // engine directly (bypassing the dictionary short-circuit).

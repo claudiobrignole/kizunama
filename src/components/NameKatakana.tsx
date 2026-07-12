@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { nameToKatakana, type KatakanaLanguage, type KatakanaResult } from '../utils/katakana';
 import { PHONETIC_LANGUAGES } from '../utils/languagePhonetics';
 import { useI18n } from '../i18n/context';
@@ -34,16 +34,21 @@ export function NameKatakana({
     : { ...messages.nameKatakana, placeholder: messages.surnameField.placeholder };
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const requestIdRef = useRef(0);
 
   const handleConvert = async () => {
     if (!name.trim()) return;
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     setCopied(false);
     try {
       const r = await nameToKatakana(name, lang);
+      if (requestId !== requestIdRef.current) return;
       onResult(r);
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -70,7 +75,7 @@ export function NameKatakana({
             onNameChange(e.target.value);
             onResult(null);
           }}
-          onKeyDown={(e) => e.key === 'Enter' && handleConvert()}
+          onKeyDown={(e) => e.key === 'Enter' && void handleConvert()}
           maxLength={40}
         />
         {isGiven && (
@@ -82,7 +87,12 @@ export function NameKatakana({
             ))}
           </select>
         )}
-        <button type="button" className="mg-btn mg-btn--red" onClick={handleConvert} disabled={loading || !name.trim()}>
+        <button
+          type="button"
+          className="mg-btn mg-btn--red"
+          onClick={() => void handleConvert()}
+          disabled={loading || !name.trim()}
+        >
           {loading ? t.converting : t.convert}
         </button>
       </div>
@@ -92,7 +102,7 @@ export function NameKatakana({
           <span className="kz-katakana-result__text" lang="ja">
             {result.katakana}
           </span>
-          <button type="button" className="kz-copy-btn" onClick={handleCopy}>
+          <button type="button" className="kz-copy-btn" onClick={() => void handleCopy()}>
             {copied ? t.copied : t.copy}
           </button>
           {showCredibility && <CredibilityBadge tier={result.tier} />}

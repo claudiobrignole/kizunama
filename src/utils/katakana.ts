@@ -25,6 +25,11 @@ const { _meta: _dictMeta, ...dict } = nameDict as unknown as Record<string, stri
 /** Cached load of the ENAMDICT conventional-name index (own Vite chunk). */
 let conventionalNamesPromise: Promise<Record<string, ConventionalEntry>> | null = null;
 
+/** eSpeak WASM is a single shared worker — serialize calls and bound wait time. */
+const PHONEMIZER_TIMEOUT_MS = 8_000;
+let phonemizerModulePromise: Promise<typeof import('phonemizer')> | null = null;
+let phonemizeChain: Promise<void> = Promise.resolve();
+
 export function loadJmnedictNames(): Promise<Record<string, ConventionalEntry>> {
   if (!conventionalNamesPromise) {
     conventionalNamesPromise = import('../data/jmnedictNames.json').then(
@@ -37,6 +42,50 @@ export function loadJmnedictNames(): Promise<Record<string, ConventionalEntry>> 
 /** Warm the JMnedict chunk during idle time after first paint. */
 export function prefetchJmnedictNames(): void {
   void loadJmnedictNames();
+}
+
+function loadPhonemizerModule(): Promise<typeof import('phonemizer')> {
+  if (!phonemizerModulePromise) {
+    phonemizerModulePromise = import('phonemizer').catch((err) => {
+      // Allow a later retry if the first dynamic import fails (e.g. SW blip).
+      phonemizerModulePromise = null;
+      throw err;
+    });
+  }
+  return phonemizerModulePromise;
+}
+
+/** Warm eSpeak WASM so the first unknown English name is less likely to stall. */
+export function prefetchPhonemizer(): void {
+  void loadPhonemizerModule()
+    .then(({ phonemize }) => phonemize('a', 'en-us'))
+    .catch(() => undefined);
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      },
+    );
+  });
+}
+
+/** Run `task` strictly after prior phonemize work (success or failure). */
+function enqueuePhonemize<T>(task: () => Promise<T>): Promise<T> {
+  const run = phonemizeChain.then(task, task);
+  phonemizeChain = run.then(
+    () => undefined,
+    () => undefined,
+  );
+  return run;
 }
 
 function normalizeKey(input: string): string {
@@ -61,18 +110,42 @@ function penaltiesByMora(outputRomaji: string, katakana: string, penalties: Epen
   return result;
 }
 
+/** Last-resort EN path when eSpeak is unavailable or hung. */
+function englishFallback(asciiName: string): KatakanaResult {
+  const report = applyEpenthesisDetailed(asciiName.toLowerCase());
+  const katakana = wanakana.toKatakana(report.output) || wanakana.toKatakana(asciiName.toLowerCase());
+  return {
+    katakana,
+    method: 'fallback',
+    tier: 'approximate',
+    moraPenaltyPoints: katakana ? penaltiesByMora(report.output, katakana, report.penalties) : undefined,
+  };
+}
+
 /**
  * Lazily loads the eSpeak-NG (WASM) powered phonemizer. Only English voices
  * are bundled by the `phonemizer` package, so this is only used for the
  * "en" language option; other languages use rule-based approximation.
+ *
+ * Calls are serialized and hard-timed-out: the shared WASM worker can stall
+ * forever under concurrent use / flaky SW-cached module loads, which used to
+ * leave the UI stuck on "Loading phonetic engine…".
  */
 async function phoneticEnglish(name: string): Promise<string | null> {
   try {
-    const { phonemize } = await import('phonemizer');
-    const parts = await phonemize(name, 'en-us');
-    const ipa = parts.join(' ');
-    const katakana = ipaToKatakana(ipa);
-    return katakana || null;
+    return await enqueuePhonemize(async () =>
+      withTimeout(
+        (async () => {
+          const { phonemize } = await loadPhonemizerModule();
+          const parts = await phonemize(name, 'en-us');
+          const ipa = parts.join(' ');
+          const katakana = ipaToKatakana(ipa);
+          return katakana || null;
+        })(),
+        PHONEMIZER_TIMEOUT_MS,
+        'phonemizer',
+      ),
+    );
   } catch {
     return null;
   }
@@ -114,26 +187,29 @@ export async function nameToKatakana(name: string, lang: KatakanaLanguage = 'en'
     if (phonetic) {
       return { katakana: phonetic, method: 'phonetic', tier: 'approximate' };
     }
-  } else {
-    const { romaji, lengthenFinalVowel } = approximatePronunciation(asciiName, lang);
-    const report = applyEpenthesisDetailed(romaji, { longVowelAdjustment: lengthenFinalVowel });
-    let katakana = wanakana.toKatakana(report.output);
-    if (katakana && lengthenFinalVowel) {
-      katakana += 'ー';
-    }
-    if (katakana) {
-      return {
-        katakana,
-        method: 'rule-based',
-        tier: 'approximate',
-        moraPenaltyPoints: penaltiesByMora(report.output, katakana, report.penalties),
-      };
-    }
+    return englishFallback(asciiName);
   }
 
-  return {
-    katakana: wanakana.toKatakana(asciiName.toLowerCase()),
-    method: 'fallback',
-    tier: 'approximate',
-  };
+  const { romaji, lengthenFinalVowel } = approximatePronunciation(asciiName, lang);
+  const report = applyEpenthesisDetailed(romaji, { longVowelAdjustment: lengthenFinalVowel });
+  let katakana = wanakana.toKatakana(report.output);
+  if (katakana && lengthenFinalVowel) {
+    katakana += 'ー';
+  }
+  if (katakana) {
+    return {
+      katakana,
+      method: 'rule-based',
+      tier: 'approximate',
+      moraPenaltyPoints: penaltiesByMora(report.output, katakana, report.penalties),
+    };
+  }
+
+  return englishFallback(asciiName);
 }
+
+/** @internal test helpers */
+export const __phonemizerTestUtils = {
+  PHONEMIZER_TIMEOUT_MS,
+  withTimeout,
+};
