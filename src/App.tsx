@@ -115,7 +115,7 @@ function App() {
             <div className="kz-brand-lockup">
               <span className="kz-brand-lockup__name">
                 <span className="kz-brand-lockup__kanji" lang="ja">
-                  絆名
+                  キズナマ
                 </span>{' '}
                 KIZUNAMA
               </span>
