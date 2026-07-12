@@ -57,7 +57,8 @@ async function registerLocalJpFont(): Promise<FontFace> {
         display: 'block',
       });
       const loaded = await face.load();
-      document.fonts.add(loaded);
+      // FontFaceSet.add exists at runtime; TS 5.9 DOM libs omit it from the type.
+      (document.fonts as FontFaceSet & Set<FontFace>).add(loaded);
       return loaded;
     })();
   }

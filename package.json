@@ -33,8 +33,11 @@
     "kanjidic2-json": "^0.1.0",
     "oxlint": "^1.71.0",
     "sharp": "^0.35.3",
-    "typescript": "~6.0.2",
+    "typescript": "~5.9.3",
     "vite": "^8.1.1",
     "vitest": "^4.1.10"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
