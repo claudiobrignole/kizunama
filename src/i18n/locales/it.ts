@@ -2,7 +2,7 @@ import type { Messages } from '../messages';
 
 const it = {
   header: {
-    tagline: 'Trasforma il tuo nome in uno giapponese\nscritto in caratteri Katakana e Kanji',
+    tagline: 'Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
     helpButton: 'Come funziona',
   },
   languageBanner: {

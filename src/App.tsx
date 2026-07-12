@@ -229,14 +229,7 @@ function App() {
                 KIZUNAMA
               </span>
             </div>
-            <p className="kz-header-tagline">
-              {messages.header.tagline.split('\n').map((line, i) => (
-                <span key={i}>
-                  {i > 0 && <br />}
-                  {line}
-                </span>
-              ))}
-            </p>
+            <p className="kz-header-tagline">{messages.header.tagline}</p>
           </div>
           <div className="kz-header-actions">
             <LanguageSwitcher variant="header" />
