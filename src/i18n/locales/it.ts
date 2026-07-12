@@ -6,12 +6,19 @@ const it = {
     helpButton: 'Come funziona',
   },
   languageBanner: {
-    question: 'Vuoi usare Kizunama in italiano?',
-    accept: 'Sì, cambia lingua',
-    stay: 'Resta in inglese',
+    question: 'Vuoi continuare in inglese?',
+    continueEnglish: 'Continue in English',
+    continueItalian: 'Continua in italiano',
   },
   languageSwitcher: {
     label: 'Lingua',
+  },
+  meta: {
+    title: '絆名 | KIZUNAMA — Trasforma il tuo nome in Katakana e Kanji',
+    description:
+      'Trasforma il tuo nome in un nome giapponese in Katakana e Kanji, gratis. Ateji scelti per il suono, numerologia seimei handan e un timbro Hanko condividibile. Nessuna AI, nessun account, installabile come app.',
+    ogTitle: '絆名 | KIZUNAMA — Trasforma il tuo nome in Katakana e Kanji',
+    ogDescription: 'Trasforma il tuo nome in Katakana e Kanji. Gratis, senza AI, senza account.',
   },
   band1: {
     index: '01.SUONO',
@@ -31,11 +38,13 @@ const it = {
     placeholder: 'Il tuo cognome — serve solo per il punteggio di seimei handan',
     hint: 'Senza cognome possiamo calcolare solo i pilastri legati al nome proprio.',
   },
-  credibility: {
+  transliteration: {
     label: 'Attendibilità della trascrizione',
-    high: 'Alta — ogni suono ha un equivalente naturale in giapponese',
-    medium: 'Media — un paio di suoni sono solo un\'approssimazione dell\'originale',
-    low: 'Bassa — questo nome ha diversi suoni senza un vero equivalente giapponese',
+    validated: 'Validata',
+    conventional: 'Convenzionale',
+    approximate: 'Approssimativa',
+    conventionalNote: 'dizionario EDRDG',
+    approximateWarning: 'Approssimazione automatica: questa grafia non è stata validata da una persona.',
   },
   band2: {
     index: '02.ATEJI',
@@ -55,7 +64,14 @@ const it = {
     swapTitle: 'Scegli un Kanji alternativo per questo suono',
     swapClose: 'Chiudi',
     strokesLabel: 'tratti',
-    meaningLabel: 'Significato',
+    meaningLabel: 'Significato (fonte inglese)',
+    readingLabel: 'Lettura usata',
+    phoneticFitLabel: 'Aderenza fonetica',
+    freeAdaptation: 'adattamento libero',
+    disclaimer:
+      'Ateji scelti solo per il suono: questi Kanji non formano un vero nome giapponese e le letture possono variare secondo il contesto.',
+    fitExplanation:
+      'L’aderenza parte dal 100% per Kanji. Penalità: l→r −10, approssimazione di v −15, ogni vocale inserita −8, vocale lunga −5 e altra normalizzazione Katakana estesa −4. La combinazione è una media pesata per mora.',
     chosenBadge: 'Selezionato',
     selectButton: 'Usa questa combinazione',
     surnameHeading: 'Cognome',
@@ -133,7 +149,8 @@ const it = {
         title: 'Ateji: Kanji scelti per il suono',
         body: [
           'Gli ateji (当て字) sono Kanji usati solo per la loro pronuncia, ignorando il significato abituale — il modo storico con cui il Giappone scriveva nomi stranieri e prestiti linguistici prima che il Katakana diventasse lo standard.',
-          'Ogni Kanji qui è stato scelto perché una sillaba del tuo nome corrisponde a una delle sue letture (lettura da nome proprio, lettura di origine cinese o lettura nativa) — non perché il suo significato ha un legame con te.',
+          'Ogni Kanji qui è stato scelto perché una sillaba del tuo nome corrisponde a una lettura di origine cinese o a una lettura nativa comune esplicitamente curata — non per il suo significato.',
+          'L’aderenza fonetica parte dal 100% per Kanji: l→r costa 10 punti, l’approssimazione di v 15, ogni vocale inserita 8, la vocale lunga 5 e ogni altra normalizzazione Katakana estesa 4. Il totale è pesato per mora.',
           'Quando un suono non ha una corrispondenza Kanji naturale, resta in Katakana invece di essere forzato su un carattere non correlato.',
           'È un esercizio giocoso e decorativo — non è come si scelgono realmente i nomi giapponesi oggi.',
         ],
@@ -174,7 +191,7 @@ const it = {
     credits: 'Realizzato da',
     sourcesTitle: 'Fonti e licenze',
     sourcesBody:
-      'Letture, numero di tratti e significati dei Kanji da KANJIDIC2, per gentile concessione dell\'Electronic Dictionary Research and Development Group (EDRDG), usati secondo la licenza EDRDG. La tabella della fortuna del seimei handan e le liste di boost/esclusione degli ateji sono una curatela editoriale originale di Kizunama.',
+      'Letture, numero di tratti e significati dei Kanji da KANJIDIC2 e grafie convenzionali dei nomi stranieri da ENAMDICT/JMnedict, per gentile concessione dell\'Electronic Dictionary Research and Development Group (EDRDG), usati secondo la licenza EDRDG. La tabella della fortuna del seimei handan e le liste di boost/esclusione degli ateji sono una curatela editoriale originale di Kizunama.',
     sponsorCta: 'Corso di giapponese gratuito',
   },
   generalDisclaimer:

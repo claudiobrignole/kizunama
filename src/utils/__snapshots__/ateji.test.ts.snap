@@ -1,0 +1,89 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`generateAtejiCandidates: general behaviour > snapshots the ranked ateji pipeline for ヒカル 1`] = `
+[
+  {
+    "fit": 100,
+    "readings": [
+      "ヒカル",
+    ],
+    "text": "光",
+  },
+  {
+    "fit": 100,
+    "readings": [
+      "ヒ",
+      "カ",
+      "ル",
+    ],
+    "text": "費加流",
+  },
+  {
+    "fit": 100,
+    "readings": [
+      "ヒ",
+      "カ",
+      "ル",
+    ],
+    "text": "比加流",
+  },
+]
+`;
+
+exports[`generateAtejiCandidates: general behaviour > snapshots the ranked ateji pipeline for マリ 1`] = `
+[
+  {
+    "fit": 100,
+    "readings": [
+      "マ",
+      "リ",
+    ],
+    "text": "麻理",
+  },
+  {
+    "fit": 100,
+    "readings": [
+      "マ",
+      "リ",
+    ],
+    "text": "摩理",
+  },
+  {
+    "fit": 100,
+    "readings": [
+      "マ",
+      "リ",
+    ],
+    "text": "磨理",
+  },
+]
+`;
+
+exports[`generateAtejiCandidates: general behaviour > snapshots the ranked ateji pipeline for ルカ 1`] = `
+[
+  {
+    "fit": 100,
+    "readings": [
+      "ル",
+      "カ",
+    ],
+    "text": "流加",
+  },
+  {
+    "fit": 100,
+    "readings": [
+      "ル",
+      "カ",
+    ],
+    "text": "路加",
+  },
+  {
+    "fit": 100,
+    "readings": [
+      "ル",
+      "カ",
+    ],
+    "text": "留加",
+  },
+]
+`;

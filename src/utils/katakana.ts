@@ -1,22 +1,40 @@
-import anyAscii from 'any-ascii';
 import * as wanakana from 'wanakana';
 import nameDict from '../data/nameKatakanaDict.json';
+import conventionalNamesData from '../data/jmnedictNames.json';
 import { ipaToKatakana } from './ipaToKatakana';
 import { approximatePronunciation, type PhoneticLanguage } from './languagePhonetics';
-import { applyEpenthesis } from './romajiEpenthesis';
+import { moraSegment } from './mora';
+import { applyEpenthesisDetailed, type EpenthesisPenalty } from './romajiEpenthesis';
 
 export type KatakanaMethod = 'dictionary' | 'phonetic' | 'rule-based' | 'fallback';
+export type TransliterationTier = 'validated' | 'conventional' | 'approximate';
 export type KatakanaLanguage = 'en' | PhoneticLanguage;
 
 export interface KatakanaResult {
   katakana: string;
   method: KatakanaMethod;
+  tier: TransliterationTier;
+  alternates?: string[];
+  /** Fixed fit penalties assigned to the output mora they affect. */
+  moraPenaltyPoints?: number[];
 }
 
 const { _meta: _dictMeta, ...dict } = nameDict as unknown as Record<string, string> & { _meta: unknown };
+const conventionalNames = conventionalNamesData as Record<string, { k: string; a?: string[] }>;
 
 function normalizeKey(input: string): string {
-  return anyAscii(input).toLowerCase().replace(/[^a-z]/g, '');
+  return input.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z]/g, '');
+}
+
+function penaltiesByMora(outputRomaji: string, katakana: string, penalties: EpenthesisPenalty[]): number[] {
+  const mora = moraSegment(katakana);
+  const result = Array.from({ length: mora.length }, () => 0);
+  for (const penalty of penalties) {
+    const prefix = wanakana.toKatakana(outputRomaji.slice(0, penalty.outputEnd));
+    const index = Math.max(0, Math.min(mora.length - 1, moraSegment(prefix).length - 1));
+    result[index] += penalty.points;
+  }
+  return result;
 }
 
 /**
@@ -44,31 +62,50 @@ async function phoneticEnglish(name: string): Promise<string | null> {
  */
 export async function nameToKatakana(name: string, lang: KatakanaLanguage = 'en'): Promise<KatakanaResult> {
   const trimmed = name.trim();
-  if (!trimmed) return { katakana: '', method: 'fallback' };
+  if (!trimmed) return { katakana: '', method: 'fallback', tier: 'approximate' };
 
   const key = normalizeKey(trimmed);
   if (dict[key]) {
-    return { katakana: dict[key], method: 'dictionary' };
+    return { katakana: dict[key], method: 'dictionary', tier: 'validated' };
   }
 
-  const asciiName = anyAscii(trimmed);
+  const conventional = conventionalNames[key];
+  if (conventional) {
+    return {
+      katakana: conventional.k,
+      method: 'dictionary',
+      tier: 'conventional',
+      alternates: conventional.a,
+    };
+  }
+
+  const asciiName = trimmed.normalize('NFKD').replace(/\p{M}/gu, '');
 
   if (lang === 'en') {
     const phonetic = await phoneticEnglish(asciiName);
     if (phonetic) {
-      return { katakana: phonetic, method: 'phonetic' };
+      return { katakana: phonetic, method: 'phonetic', tier: 'approximate' };
     }
   } else {
     const { romaji, lengthenFinalVowel } = approximatePronunciation(asciiName, lang);
-    const epenthesized = applyEpenthesis(romaji);
-    let katakana = wanakana.toKatakana(epenthesized);
+    const report = applyEpenthesisDetailed(romaji, { longVowelAdjustment: lengthenFinalVowel });
+    let katakana = wanakana.toKatakana(report.output);
     if (katakana && lengthenFinalVowel) {
       katakana += 'ー';
     }
     if (katakana) {
-      return { katakana, method: 'rule-based' };
+      return {
+        katakana,
+        method: 'rule-based',
+        tier: 'approximate',
+        moraPenaltyPoints: penaltiesByMora(report.output, katakana, report.penalties),
+      };
     }
   }
 
-  return { katakana: wanakana.toKatakana(asciiName.toLowerCase()), method: 'fallback' };
+  return {
+    katakana: wanakana.toKatakana(asciiName.toLowerCase()),
+    method: 'fallback',
+    tier: 'approximate',
+  };
 }

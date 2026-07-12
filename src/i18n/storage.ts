@@ -29,10 +29,11 @@ export function setStoredLocale(locale: LocaleCode): void {
   writeCookie(LANG_COOKIE, locale, COOKIE_MAX_AGE_DAYS);
 }
 
-export function getBrowserLocale(): LocaleCode | null {
-  if (typeof navigator === 'undefined') return null;
-  const short = (navigator.language || 'en').slice(0, 2).toLowerCase();
-  return isSupportedLocale(short) ? short : null;
+/** True when the browser UI language is not Italian (e.g. en-US, fr-FR). */
+export function browserPrefersNonItalian(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const lang = (navigator.language || '').toLowerCase();
+  return Boolean(lang) && !lang.startsWith('it');
 }
 
 export function isLanguageBannerDismissed(): boolean {

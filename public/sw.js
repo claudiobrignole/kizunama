@@ -1,6 +1,8 @@
-const CACHE_NAME = 'kizunama-v4';
+const CACHE_NAME = 'kizunama-v5';
 const CORE_ASSETS = [
   '/',
+  '/en/',
+  '/en/index.html',
   '/manifest.webmanifest',
   '/icons/icon.svg',
   '/icons/icon-192.png',

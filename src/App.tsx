@@ -60,11 +60,15 @@ function App() {
   };
 
   const givenCombos = useMemo(
-    () => (givenResult?.katakana ? generateAtejiCandidates(givenResult.katakana) : []),
+    () => (givenResult?.katakana
+      ? generateAtejiCandidates(givenResult.katakana, 8, givenResult.moraPenaltyPoints)
+      : []),
     [givenResult],
   );
   const surnameCombos = useMemo(
-    () => (surnameResult?.katakana ? generateAtejiCandidates(surnameResult.katakana) : []),
+    () => (surnameResult?.katakana
+      ? generateAtejiCandidates(surnameResult.katakana, 8, surnameResult.moraPenaltyPoints)
+      : []),
     [surnameResult],
   );
 
@@ -204,6 +208,7 @@ function App() {
                   onSelectCombo={setSelectedSurnameIdx}
                   overrides={surnameOverrides}
                   onOverride={(key, candidate) => setSurnameOverrides((prev) => ({ ...prev, [key]: candidate }))}
+                  showDisclaimer={surnameCombos.length > 0}
                 />
               )}
               <AtejiCandidates
@@ -213,6 +218,7 @@ function App() {
                 onSelectCombo={setSelectedGivenIdx}
                 overrides={givenOverrides}
                 onOverride={(key, candidate) => setGivenOverrides((prev) => ({ ...prev, [key]: candidate }))}
+                showDisclaimer={surnameCombos.length === 0}
               />
             </div>
           </div>

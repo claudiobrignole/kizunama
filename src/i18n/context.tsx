@@ -1,49 +1,50 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { LocaleCode, Messages } from './messages';
+import { localeFromPathname } from './messages';
 import en from './locales/en';
 import it from './locales/it';
-import fr from './locales/fr';
-import de from './locales/de';
-import es from './locales/es';
-import pt from './locales/pt';
-import { getBrowserLocale, getStoredLocale, setStoredLocale } from './storage';
+import { setStoredLocale } from './storage';
 
-const CATALOG: Record<LocaleCode, Messages> = { en, it, fr, de, es, pt };
+const CATALOG: Record<LocaleCode, Messages> = { en, it };
 
 interface I18nContextValue {
   locale: LocaleCode;
   messages: Messages;
-  setLocale: (locale: LocaleCode) => void;
-  browserLocale: LocaleCode | null;
+  /** Navigate to the other locale’s URL (real navigation). */
+  navigateToLocale: (locale: LocaleCode) => void;
 }
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
-function resolveInitialLocale(): LocaleCode {
-  return getStoredLocale() ?? 'en';
+function resolveLocaleFromLocation(): LocaleCode {
+  if (typeof window === 'undefined') return 'it';
+  return localeFromPathname(window.location.pathname);
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<LocaleCode>(resolveInitialLocale);
-  const browserLocale = useMemo(() => getBrowserLocale(), []);
+  const [locale, setLocaleState] = useState<LocaleCode>(resolveLocaleFromLocation);
 
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.documentElement.lang = locale;
-    }
+    const fromUrl = resolveLocaleFromLocation();
+    setLocaleState(fromUrl);
+    setStoredLocale(fromUrl);
+    document.documentElement.lang = fromUrl;
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
   }, [locale]);
 
-  const setLocale = useCallback((next: LocaleCode) => {
-    setLocaleState(next);
+  const navigateToLocale = useCallback((next: LocaleCode) => {
     setStoredLocale(next);
-    if (typeof document !== 'undefined') {
-      document.documentElement.lang = next;
-    }
+    const target = next === 'en' ? '/en/' : '/';
+    const search = window.location.search;
+    window.location.assign(search ? `${target}${search}` : target);
   }, []);
 
   const value = useMemo<I18nContextValue>(
-    () => ({ locale, messages: CATALOG[locale], setLocale, browserLocale }),
-    [locale, setLocale, browserLocale],
+    () => ({ locale, messages: CATALOG[locale], navigateToLocale }),
+    [locale, navigateToLocale],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

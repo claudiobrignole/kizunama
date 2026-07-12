@@ -10,6 +10,7 @@ interface AtejiCandidatesProps {
   onOverride: (moraKey: string, candidate: AtejiIndexCandidate) => void;
   allowSwap?: boolean;
   heading?: string;
+  showDisclaimer?: boolean;
 }
 
 function comboLabelText(combo: AtejiCombo): string {
@@ -18,9 +19,8 @@ function comboLabelText(combo: AtejiCombo): string {
 
 function readingTypeLabel(
   type: AtejiIndexCandidate['readingType'] | undefined,
-  t: { readingTypeNanori: string; readingTypeOn: string; readingTypeKun: string },
+  t: { readingTypeOn: string; readingTypeKun: string },
 ): string {
-  if (type === 'nanori') return t.readingTypeNanori;
   if (type === 'on') return t.readingTypeOn;
   return t.readingTypeKun;
 }
@@ -33,8 +33,9 @@ export function AtejiCandidates({
   onOverride,
   allowSwap = true,
   heading,
+  showDisclaimer = false,
 }: AtejiCandidatesProps) {
-  const { messages } = useI18n();
+  const { messages, locale } = useI18n();
   const t = messages.atejiCandidates;
   const [openSwapKey, setOpenSwapKey] = useState<string | null>(null);
 
@@ -52,6 +53,11 @@ export function AtejiCandidates({
 
   return (
     <div className="kz-ateji-block">
+      {showDisclaimer && (
+        <aside className="kz-ateji-disclaimer" role="note" title={t.fitExplanation}>
+          {t.disclaimer}
+        </aside>
+      )}
       {heading && <h3 className="kz-ateji-block__heading">{heading}</h3>}
       <div className="kz-ateji-combo-grid" role="radiogroup">
         {combos.slice(0, 6).map((combo, i) => {
@@ -70,7 +76,7 @@ export function AtejiCandidates({
                 {comboLabelText(combo)}
               </span>
               <span className="kz-ateji-combo-chip__label">
-                {isChosen ? t.chosenBadge : t.selectButton}
+                {isChosen ? t.chosenBadge : t.selectButton} · {combo.fitPercent}%
               </span>
             </button>
           );
@@ -87,6 +93,7 @@ export function AtejiCandidates({
             <div className={`kz-ateji-slot${span.kanji ? '' : ' kz-ateji-slot--unmatched'}`} key={`${moraKey}-${i}`}>
               <div className="kz-ateji-slot__char" lang="ja">
                 {span.kanji ?? moraKey}
+                {span.kanji && <small className="kz-ateji-slot__reading"> {moraKey}</small>}
               </div>
               {span.kanji ? (
                 <>
@@ -94,9 +101,13 @@ export function AtejiCandidates({
                     {readingTypeLabel(span.readingType, t)}
                     {span.boosted && <span className="kz-ateji-slot__historical"> · {t.historicalBadge}</span>}
                   </div>
-                  {span.meaningEn && (
+                  <div className="kz-ateji-slot__fit">
+                    {t.phoneticFitLabel}: {span.fitPercent}%
+                    {span.fitPercent < 70 && <strong> · {t.freeAdaptation}</strong>}
+                  </div>
+                  {(span.meaningEn || span.meaningIt) && (
                     <div className="kz-ateji-slot__meaning">
-                      {t.meaningLabel}: {span.meaningEn}
+                      {t.meaningLabel}: {locale === 'it' ? span.meaningIt || span.meaningEn : span.meaningEn}
                     </div>
                   )}
                   {allowSwap && alternates.length > 1 && (

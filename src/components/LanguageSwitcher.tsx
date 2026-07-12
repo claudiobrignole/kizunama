@@ -7,7 +7,7 @@ interface LanguageSwitcherProps {
 }
 
 export function LanguageSwitcher({ variant = 'header' }: LanguageSwitcherProps) {
-  const { locale, setLocale, messages } = useI18n();
+  const { locale, navigateToLocale, messages } = useI18n();
   const groupLabel = messages.languageSwitcher.label;
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -35,8 +35,9 @@ export function LanguageSwitcher({ variant = 'header' }: LanguageSwitcherProps) 
   }, [open]);
 
   const choose = (code: LocaleCode) => {
-    setLocale(code);
     setOpen(false);
+    if (code === locale) return;
+    navigateToLocale(code);
   };
 
   return (

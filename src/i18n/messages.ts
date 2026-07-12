@@ -11,11 +11,17 @@ export interface Messages {
   };
   languageBanner: {
     question: string;
-    accept: string;
-    stay: string;
+    continueEnglish: string;
+    continueItalian: string;
   };
   languageSwitcher: {
     label: string;
+  };
+  meta: {
+    title: string;
+    description: string;
+    ogTitle: string;
+    ogDescription: string;
   };
   band1: {
     index: string;
@@ -35,11 +41,13 @@ export interface Messages {
     placeholder: string;
     hint: string;
   };
-  credibility: {
+  transliteration: {
     label: string;
-    high: string;
-    medium: string;
-    low: string;
+    validated: string;
+    conventional: string;
+    approximate: string;
+    conventionalNote: string;
+    approximateWarning: string;
   };
   band2: {
     index: string;
@@ -60,6 +68,11 @@ export interface Messages {
     swapClose: string;
     strokesLabel: string;
     meaningLabel: string;
+    readingLabel: string;
+    phoneticFitLabel: string;
+    freeAdaptation: string;
+    disclaimer: string;
+    fitExplanation: string;
     chosenBadge: string;
     selectButton: string;
     surnameHeading: string;
@@ -145,24 +158,33 @@ export interface Messages {
   generalDisclaimer: string;
 }
 
-export type LocaleCode = 'en' | 'it' | 'fr' | 'de' | 'es' | 'pt';
+export type LocaleCode = 'en' | 'it';
 
-export const SUPPORTED_LOCALES: LocaleCode[] = ['en', 'it', 'fr', 'de', 'es', 'pt'];
+export const SUPPORTED_LOCALES: LocaleCode[] = ['it', 'en'];
 
 export const LOCALE_LABELS: Record<LocaleCode, string> = {
   en: 'EN',
   it: 'IT',
-  fr: 'FR',
-  de: 'DE',
-  es: 'ES',
-  pt: 'PT',
 };
 
 export const LOCALE_NAMES: Record<LocaleCode, string> = {
   en: 'English',
   it: 'Italiano',
-  fr: 'Français',
-  de: 'Deutsch',
-  es: 'Español',
-  pt: 'Português',
 };
+
+/** Production site origin used for canonical / hreflang / sitemap. */
+export const SITE_ORIGIN = 'https://kizunama.com';
+
+/** Locale from the URL path: /en or /en/… → en, otherwise it. */
+export function localeFromPathname(pathname: string): LocaleCode {
+  const path = pathname.replace(/\/+$/, '') || '/';
+  if (path === '/en' || path.startsWith('/en/')) return 'en';
+  return 'it';
+}
+
+/** Absolute path for a locale, preserving an optional query string (e.g. ?n=). */
+export function pathForLocale(locale: LocaleCode, search = ''): string {
+  const base = locale === 'en' ? '/en/' : '/';
+  if (!search || search === '?') return base;
+  return `${base}${search.startsWith('?') ? search : `?${search}`}`;
+}

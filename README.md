@@ -9,10 +9,10 @@ stroke count of your chosen Kanji, and generate a downloadable decorative
 Hanko seal SVG. No backend, no accounts, no per-request costs — everything
 runs in the browser and the app works offline once installed.
 
-The UI is fully translated into English, Italian, French, German, Spanish
-and Portuguese (`src/i18n/`), with a first-visit language banner based on
-the browser language, a persistent cookie-backed language switcher in the
-header and footer, and recallable "How it works" help popups.
+The UI is available in Italian (site root `/`) and English (`/en/`), with
+localized HTML entry points, hreflang/canonical tags, and a one-time modal
+that offers English when a non-Italian browser lands on the Italian root.
+The header/footer language switcher navigates between `/` and `/en/`.
 
 Built to match the visual identity of [Luna Nihongo](https://lunanihongo.com),
 linked via the "Free Japanese course" button in the footer.
@@ -86,9 +86,8 @@ problem than converting Japanese romaji to kana (what libraries like
    common Western given names with their conventional Katakana spelling.
 2. **Phonetic (English only)** — eSpeak-NG (via `phonemizer`, lazy-loaded
    WASM) produces IPA, converted to Katakana by `src/utils/ipaToKatakana.ts`.
-3. **Rule-based (it/es/de/pt/fr)** — `src/utils/languagePhonetics.ts` applies
-   per-language letter-to-sound rules (Italian `c`/`ch` handling, French
-   silent final `e`, German `w`/`v`/diphthongs, etc.), then
+3. **Rule-based (Italian)** — `src/utils/languagePhonetics.ts` applies
+   Italian letter-to-sound rules (e.g. `c`/`ch`/`gn`), then
    `src/utils/romajiEpenthesis.ts` inserts the epenthetic vowels Japanese
    phonotactics require (default `u`/`o` after consonant clusters, `i`
    after `ch`/`j`, `l`→`r`, `v`→ the extended ヴ series) before handing off
@@ -167,11 +166,11 @@ Node runtime needed in production.
   ateji boost/exclusion lists (`src/data/atejiBoostlist.json`,
   `src/data/atejiBlocklist.json`) are original editorial curation by
   Kizunama, not sourced from KANJIDIC2.
-- Katakana conversion combines a hand-curated name dictionary, rule-based
-  per-language phonetic approximation, `wanakana`, `any-ascii`, and
-  `phonemizer` (eSpeak-NG).
-- Full credits are shown in the app footer, translated in all 6 supported
-  UI languages (`src/i18n/locales/`).
+- Katakana conversion combines a hand-curated name dictionary, Italian
+  rule-based phonetic approximation, `wanakana`, `any-ascii`, and
+  `phonemizer` (eSpeak-NG for English).
+- Full credits are shown in the app footer (`src/i18n/locales/` — Italian
+  and English).
 
 ## Disclaimer
 

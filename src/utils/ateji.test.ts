@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import * as wanakana from 'wanakana';
-import { atejiCredibility, generateAtejiCandidates } from './ateji';
+import { atejiCredibility, candidatesForReading, generateAtejiCandidates } from './ateji';
 
 function comboHasSingleKanjiSpan(combos: ReturnType<typeof generateAtejiCandidates>, kanji: string, moraKey: string) {
   return combos.some((c) => c.spans.some((s) => s.kanji === kanji && s.mora.join('') === moraKey));
@@ -25,9 +25,10 @@ describe('generateAtejiCandidates: variable-length mora span regression', () => 
     expect(comboHasSingleKanjiSpan(combos, '守', 'マモル')).toBe(true);
   });
 
-  it('一 (hajime, 3-mora nanori-only reading) appears as a single-kanji candidate', () => {
+  it('excludes nanori-only readings from selection', () => {
     const combos = generateAtejiCandidates(wanakana.toKatakana('hajime'));
-    expect(comboHasSingleKanjiSpan(combos, '一', 'ハジメ')).toBe(true);
+    expect(comboHasSingleKanjiSpan(combos, '一', 'ハジメ')).toBe(false);
+    expect(candidatesForReading(['ハ', 'ジ', 'メ']).every((candidate) => candidate.readingType !== ('nanori' as never))).toBe(true);
   });
 });
 
@@ -47,11 +48,26 @@ describe('generateAtejiCandidates: general behaviour', () => {
     expect(combos[0].spans.some((s) => s.kanji === null)).toBe(true);
   });
 
-  it('ranks nanori/boosted/longer-span candidates above plain single-mora kun matches', () => {
+  it('ranks boosted/longer-span candidates above plain single-mora kun matches', () => {
     const combos = generateAtejiCandidates(wanakana.toKatakana('hikaru'));
     // The top-ranked combo should prefer the single 3-mora kanji span over
     // three separate 1-mora kanji, all else being reasonably equal.
     expect(combos[0].kanjiCount).toBeLessThanOrEqual(2);
+  });
+
+  it('computes per-Kanji and length-weighted combination fit', () => {
+    const combos = generateAtejiCandidates('マリ', 8, [10, 30]);
+    expect(combos[0].spans.map((span) => span.fitPercent)).toEqual([90, 70]);
+    expect(combos[0].fitPercent).toBe(80);
+  });
+
+  it.each(['マリ', 'ルカ', 'ヒカル'])('snapshots the ranked ateji pipeline for %s', (name) => {
+    const summary = generateAtejiCandidates(name, 3).map((combo) => ({
+      text: combo.spans.map((span) => span.kanji ?? span.mora.join('')).join(''),
+      readings: combo.spans.map((span) => span.mora.join('')),
+      fit: combo.fitPercent,
+    }));
+    expect(summary).toMatchSnapshot();
   });
 
   it('returns an empty array for empty input', () => {

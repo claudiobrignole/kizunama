@@ -1,0 +1,4 @@
+{
+  "_comment": "Kanji whose common kun readings are useful, name-friendly sound matches. Nanori are intentionally excluded from the generated index.",
+  "chars": ["光", "勇", "守", "明", "空", "海", "花", "星", "心", "愛", "音", "夢"]
+}

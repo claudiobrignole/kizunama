@@ -95,8 +95,13 @@ export function NameKatakana({
           <button type="button" className="kz-copy-btn" onClick={handleCopy}>
             {copied ? t.copied : t.copy}
           </button>
-          {showCredibility && <CredibilityBadge katakana={result.katakana} />}
+          {showCredibility && <CredibilityBadge tier={result.tier} />}
         </div>
+      )}
+      {result?.katakana && result.tier === 'approximate' && (
+        <p className="kz-transliteration-warning" role="alert">
+          {messages.transliteration.approximateWarning}
+        </p>
       )}
     </div>
   );

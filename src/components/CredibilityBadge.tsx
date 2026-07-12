@@ -1,18 +1,21 @@
-import { atejiCredibility } from '../utils/ateji';
 import { useI18n } from '../i18n/context';
+import type { TransliterationTier } from '../utils/katakana';
 
 interface CredibilityBadgeProps {
-  katakana: string;
+  tier: TransliterationTier;
 }
 
-export function CredibilityBadge({ katakana }: CredibilityBadgeProps) {
+export function CredibilityBadge({ tier }: CredibilityBadgeProps) {
   const { messages } = useI18n();
-  const t = messages.credibility;
-  const { level } = atejiCredibility(katakana);
-  const label = level === 'high' ? t.high : level === 'medium' ? t.medium : t.low;
+  const t = messages.transliteration;
+  const label = tier === 'validated'
+    ? t.validated
+    : tier === 'conventional'
+      ? `${t.conventional} (${t.conventionalNote})`
+      : t.approximate;
 
   return (
-    <span className={`kz-credibility-badge kz-credibility-badge--${level}`} title={t.label}>
+    <span className={`kz-credibility-badge kz-credibility-badge--${tier}`} title={t.label}>
       {label}
     </span>
   );

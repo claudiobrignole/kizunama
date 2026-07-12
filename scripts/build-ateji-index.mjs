@@ -12,7 +12,10 @@
  * src/utils/ateji.ts to turn a name's katakana mora sequence into ranked
  * ateji (sound-based kanji) candidates.
  *
- * Every reading (on, kun, nanori) is indexed at its own *full* mora length —
+ * On readings are indexed first. Common kun readings are included only for
+ * explicitly curated/boosted characters; nanori are excluded because they
+ * are too context-dependent for sound-only foreign-name matching. Every
+ * retained reading is indexed at its own *full* mora length —
  * there is deliberately no fixed 1-2 mora cap. Several of the best
  * single-kanji name readings span 3-4 mora (光=hikaru, 勇=isamu, 守=mamoru,
  * 一=hajime, ...); capping the index would silently drop exactly the
@@ -31,19 +34,21 @@ import KANJIS from 'kanjidic2-json';
 import { moraSegment } from '../src/utils/mora.ts';
 import boostlist from '../src/data/atejiBoostlist.json' with { type: 'json' };
 import blocklist from '../src/data/atejiBlocklist.json' with { type: 'json' };
+import kunAllowlist from '../src/data/atejiKunAllowlist.json' with { type: 'json' };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = path.join(__dirname, '../src/data/atejiIndex.json');
 
 const boostSet = new Set(boostlist.chars);
 const blockSet = new Set(blocklist.chars);
+const kunAllowedSet = new Set([...boostlist.chars, ...kunAllowlist.chars]);
 
 // Jōyō (taught in compulsory education, grade 1-8 in kanjidic2's scheme) +
 // jinmeiyō (grade 9-10, name-only characters) = the legally registrable pool.
 const LEGAL_GRADES = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 const legalKanji = KANJIS.filter((k) => typeof k.grade === 'number' && LEGAL_GRADES.has(k.grade));
 
-const READING_PRIORITY = { nanori: 0, on: 1, kun: 2 };
+const READING_PRIORITY = { on: 0, kun: 1 };
 
 /** Kun readings carry an okurigana marker, e.g. "ひか.る" (hikaru) or a
  * leading/trailing "-" for bound/compound forms, e.g. "ひと-", "-なが.す".
@@ -51,7 +56,7 @@ const READING_PRIORITY = { nanori: 0, on: 1, kun: 2 };
  * what gets used, e.g. 光 as a given name is read "Hikaru" in full — so we
  * strip the punctuation but keep every kana around it. */
 function cleanKunReading(reading) {
-  return reading.replace(/[.\-]/g, '');
+  return reading.replace(/[.-]/g, '');
 }
 
 function toKatakanaReading(hiraganaOrKatakana) {
@@ -84,19 +89,21 @@ for (const k of legalKanji) {
 
   const strokeCount = k.strokeCounts?.[0] ?? null;
   const meaningEn = (k.meanings?.en ?? []).slice(0, 3).join(', ');
+  // KANJIDIC2 does not provide Italian glosses. Until a licensed Italian
+  // source is added, retain the English primary gloss as the explicit fallback.
+  const meaningIt = meaningEn;
   const freq = typeof k.freq === 'number' ? k.freq : null;
   const grade = k.grade;
   const boosted = boostSet.has(k.literal);
-  const meta = { strokeCount, meaningEn, freq, grade, boosted };
+  const meta = { strokeCount, meaningEn, meaningIt, freq, grade, boosted };
 
-  for (const nanori of k.nanoris ?? []) {
-    addReading(k.literal, toKatakanaReading(nanori), 'nanori', meta);
-  }
   for (const on of k.readings?.ja_on ?? []) {
     addReading(k.literal, on, 'on', meta); // ja_on is already katakana.
   }
-  for (const kun of k.readings?.ja_kun ?? []) {
-    addReading(k.literal, toKatakanaReading(cleanKunReading(kun)), 'kun', meta);
+  if (kunAllowedSet.has(k.literal)) {
+    for (const kun of k.readings?.ja_kun ?? []) {
+      addReading(k.literal, toKatakanaReading(cleanKunReading(kun)), 'kun', meta);
+    }
   }
 }
 

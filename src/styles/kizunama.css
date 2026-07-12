@@ -240,35 +240,42 @@
   border: 0;
 }
 
-/* Language banner (first-visit browser-language prompt) */
-.kz-lang-banner {
+/* Language prompt modal (non-Italian browsers on Italian root) */
+.kz-lang-modal-overlay {
   position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.7rem;
-  flex-wrap: wrap;
-  padding: 0.75rem 1rem;
-  background: var(--ln-yellow);
+  justify-content: center;
+  padding: 1rem;
+  z-index: 210;
+}
+
+.kz-lang-modal {
+  max-width: 400px;
+  width: 100%;
+  padding: 1.35rem 1.4rem;
+}
+
+.kz-lang-modal__question {
+  margin: 0 0 1rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
   color: var(--ln-ink);
-  border-bottom: var(--border-band-top);
-  z-index: 110;
-  font-size: calc(0.84rem / var(--ln-body-text-scale));
-  font-weight: 600;
+  line-height: 1.35;
 }
 
-.kz-lang-banner__actions {
+.kz-lang-modal__actions {
   display: flex;
-  gap: 0.4rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.kz-lang-banner .mg-btn {
-  min-height: 2.2rem;
-  height: 2.2rem;
-  font-size: 0.76rem;
+.kz-lang-modal__actions .mg-btn {
+  flex: 1 1 auto;
+  min-width: 9rem;
 }
 
 /* Help dialog */
@@ -598,22 +605,36 @@
   box-shadow: 3px 3px 0 var(--ln-shadow);
 }
 
-.kz-credibility-badge--high {
+.kz-credibility-badge--validated {
   background: #d8f3e4;
   color: hsl(150, 60%, 22%);
   border-color: hsl(150, 60%, 30%);
 }
 
-.kz-credibility-badge--medium {
+.kz-credibility-badge--conventional {
   background: #fff4d6;
   color: var(--ln-ink);
   border-color: var(--ln-ink);
 }
 
-.kz-credibility-badge--low {
+.kz-credibility-badge--approximate {
   background: #fde8ec;
   color: var(--ln-red-deep);
   border-color: var(--ln-red-deep);
+}
+
+.kz-transliteration-warning,
+.kz-ateji-disclaimer {
+  margin: 0.75rem 0 0;
+  padding: 0.65rem 0.8rem;
+  border: 2px solid var(--ln-red-deep);
+  background: #fde8ec;
+  color: var(--ln-red-deep);
+  font-weight: 700;
+}
+
+.kz-ateji-disclaimer {
+  margin: 0 0 1rem;
 }
 
 /* Ateji band */
@@ -719,6 +740,12 @@
   line-height: 1.1;
 }
 
+.kz-ateji-slot__reading {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: calc(0.72rem / var(--ln-body-text-scale));
+}
+
 .kz-ateji-slot__meta {
   margin-top: 0.3rem;
   font-size: calc(0.68rem / var(--ln-body-text-scale));
@@ -734,6 +761,12 @@
   margin-top: 0.2rem;
   font-size: calc(0.68rem / var(--ln-body-text-scale));
   color: var(--text-light);
+}
+
+.kz-ateji-slot__fit {
+  margin-top: 0.25rem;
+  font-size: calc(0.7rem / var(--ln-body-text-scale));
+  color: var(--ln-red-deep);
 }
 
 .kz-ateji-slot__swap {
@@ -1103,16 +1136,6 @@
     padding: 0 0.55rem;
     min-height: 2.2rem;
     height: 2.2rem;
-  }
-
-  .kz-lang-banner {
-    flex-direction: column;
-    align-items: stretch;
-    text-align: center;
-  }
-
-  .kz-lang-banner__actions {
-    justify-content: center;
   }
 
   .kz-band .mg-band-inner {

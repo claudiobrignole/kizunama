@@ -3,9 +3,10 @@ import { isHardMora, moraSegment } from './mora';
 
 export interface AtejiIndexCandidate {
   char: string;
-  readingType: 'nanori' | 'on' | 'kun';
+  readingType: 'on' | 'kun';
   strokeCount: number | null;
   meaningEn: string;
+  meaningIt: string;
   freq: number | null;
   grade: number;
   boosted: boolean;
@@ -22,14 +23,13 @@ interface AtejiIndex {
 const atejiIndex = atejiIndexData as unknown as AtejiIndex;
 
 const READING_TYPE_WEIGHT: Record<AtejiIndexCandidate['readingType'], number> = {
-  nanori: 100,
-  on: 70,
+  on: 100,
   kun: 60,
 };
 
 /** How many alternate kanji to consider per matched mora-span. Keeping this
  * small bounds the DP's branching factor; the reading index is already
- * sorted best-first (nanori > on > kun, boosted, then lower freq). */
+ * sorted best-first (on > curated kun, boosted, then lower freq). */
 const CANDIDATES_PER_SPAN = 6;
 
 /** How many partial paths to keep at each mora position (beam search width),
@@ -46,7 +46,10 @@ export interface AtejiSpan {
   readingType?: AtejiIndexCandidate['readingType'];
   strokeCount?: number | null;
   meaningEn?: string;
+  meaningIt?: string;
   boosted?: boolean;
+  /** 100 minus fixed approximation penalties affecting this mora span. */
+  fitPercent: number;
 }
 
 export interface AtejiCombo {
@@ -55,6 +58,8 @@ export interface AtejiCombo {
   score: number;
   unmatchedMoraCount: number;
   kanjiCount: number;
+  /** Mora-length-weighted mean of the matched Kanji fit percentages. */
+  fitPercent: number;
 }
 
 interface PartialPath {
@@ -117,10 +122,14 @@ export function candidatesForReading(moraSlice: string[]): AtejiIndexCandidate[]
  *
  * Uses variable-length mora spans (1 kanji can cover 1-N mora, N derived
  * from the built index — see build-ateji-index.mjs) rather than a fixed
- * 1-2 mora window, so 3-4 mora nanori/kun readings like 光=hikaru are not
+ * 1-2 mora window, so curated 3-4 mora kun readings like 光=hikaru are not
  * silently excluded.
  */
-export function generateAtejiCandidates(katakanaName: string, maxResults = 8): AtejiCombo[] {
+export function generateAtejiCandidates(
+  katakanaName: string,
+  maxResults = 8,
+  moraPenaltyPoints: number[] = [],
+): AtejiCombo[] {
   const mora = moraSegment(katakanaName);
   if (mora.length === 0) return [];
 
@@ -137,6 +146,13 @@ export function generateAtejiCandidates(katakanaName: string, maxResults = 8): A
       if (prefixBeam.length === 0) continue;
 
       const moraSlice = mora.slice(start, end);
+      // Each approximation is assigned to one output mora by the
+      // transliteration stage. A Kanji's fit starts at 100 and loses every
+      // fixed penalty in the mora span it covers.
+      const fitPercent = Math.max(
+        0,
+        100 - moraPenaltyPoints.slice(start, end).reduce((sum, points) => sum + points, 0),
+      );
       const candidates = candidatesForSpan(moraSlice).slice(0, CANDIDATES_PER_SPAN);
 
       const spanOptions: AtejiSpan[] =
@@ -147,10 +163,12 @@ export function generateAtejiCandidates(katakanaName: string, maxResults = 8): A
               readingType: c.readingType,
               strokeCount: c.strokeCount,
               meaningEn: c.meaningEn,
+              meaningIt: c.meaningIt,
               boosted: c.boosted,
+              fitPercent,
             }))
           : len === 1
-            ? [{ mora: moraSlice, kanji: null }] // Unmatched fallback only at 1-mora granularity.
+            ? [{ mora: moraSlice, kanji: null, fitPercent }] // Unmatched fallback only at 1-mora granularity.
             : [];
 
       for (const span of spanOptions) {
@@ -172,12 +190,20 @@ export function generateAtejiCandidates(katakanaName: string, maxResults = 8): A
   }
 
   const finalPaths = [...beams[mora.length]].sort((a, b) => averageScore(b) - averageScore(a));
-  const combos: AtejiCombo[] = finalPaths.map((path) => ({
-    spans: path.spans,
-    score: path.score,
-    unmatchedMoraCount: path.unmatchedMoraCount,
-    kanjiCount: path.spans.filter((s) => s.kanji).length,
-  }));
+  const combos: AtejiCombo[] = finalPaths.map((path) => {
+    const matched = path.spans.filter((span) => span.kanji);
+    const matchedMora = matched.reduce((sum, span) => sum + span.mora.length, 0);
+    const fitPercent = matchedMora
+      ? Math.round(matched.reduce((sum, span) => sum + span.fitPercent * span.mora.length, 0) / matchedMora)
+      : 0;
+    return {
+      spans: path.spans,
+      score: path.score,
+      unmatchedMoraCount: path.unmatchedMoraCount,
+      kanjiCount: matched.length,
+      fitPercent,
+    };
+  });
 
   // De-duplicate combos that resolve to the exact same kanji sequence
   // (can happen when different mora segmentations land on the same chars).
@@ -212,7 +238,9 @@ export function applyAtejiOverrides(
       readingType: override.readingType,
       strokeCount: override.strokeCount,
       meaningEn: override.meaningEn,
+      meaningIt: override.meaningIt,
       boosted: override.boosted,
+      fitPercent: span.fitPercent,
     };
   });
 }

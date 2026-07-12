@@ -1,42 +1,62 @@
 import { useEffect, useState } from 'react';
 import { useI18n } from '../i18n/context';
-import { LOCALE_NAMES } from '../i18n/messages';
-import { dismissLanguageBanner, getStoredLocale, isLanguageBannerDismissed } from '../i18n/storage';
+import { localeFromPathname } from '../i18n/messages';
+import {
+  browserPrefersNonItalian,
+  dismissLanguageBanner,
+  isLanguageBannerDismissed,
+  setStoredLocale,
+} from '../i18n/storage';
 
+/**
+ * One-time modal on the Italian root when the browser language is not Italian.
+ * Never auto-redirects — user chooses English (/en/) or stays on Italian.
+ */
 export function LanguageBanner() {
-  const { browserLocale, setLocale, messages } = useI18n();
+  const { messages, navigateToLocale } = useI18n();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!browserLocale || browserLocale === 'en') return;
-    if (getStoredLocale()) return;
+    if (typeof window === 'undefined') return;
+    if (localeFromPathname(window.location.pathname) !== 'it') return;
+    if (!browserPrefersNonItalian()) return;
     if (isLanguageBannerDismissed()) return;
     setVisible(true);
-  }, [browserLocale]);
+  }, []);
 
-  if (!visible || !browserLocale) return null;
+  if (!visible) return null;
 
-  const handleAccept = () => {
-    setLocale(browserLocale);
-    setVisible(false);
+  const handleEnglish = () => {
+    dismissLanguageBanner();
+    setStoredLocale('en');
+    navigateToLocale('en');
   };
 
-  const handleStay = () => {
+  const handleItalian = () => {
     dismissLanguageBanner();
+    setStoredLocale('it');
     setVisible(false);
   };
 
   return (
-    <div className="kz-lang-banner" role="dialog" aria-label={LOCALE_NAMES[browserLocale]}>
-      <span>{messages.languageBanner.question}</span>
-      <span className="kz-lang-banner__actions">
-        <button type="button" className="mg-btn mg-btn--red" onClick={handleAccept}>
-          {messages.languageBanner.accept}
-        </button>
-        <button type="button" className="mg-btn" onClick={handleStay}>
-          {messages.languageBanner.stay}
-        </button>
-      </span>
+    <div className="kz-lang-modal-overlay" role="presentation" onClick={handleItalian}>
+      <div
+        className="mg-card kz-lang-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={messages.languageBanner.question}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="kz-lang-modal__question">{messages.languageBanner.question}</p>
+        <div className="kz-lang-modal__actions">
+          <button type="button" className="mg-btn mg-btn--red" onClick={handleEnglish}>
+            {messages.languageBanner.continueEnglish}
+          </button>
+          <button type="button" className="mg-btn" onClick={handleItalian}>
+            {messages.languageBanner.continueItalian}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
