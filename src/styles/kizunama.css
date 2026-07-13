@@ -1473,9 +1473,27 @@
     grid-template-columns: 1fr;
   }
 
+  .kz-ateji-combo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .kz-ateji-combo-chip {
+    width: 100%;
+    padding: 0.5rem 0.45rem;
+  }
+
+  .kz-ateji-slot-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
   .kz-ateji-slot {
-    flex: 1 1 5rem;
-    min-width: 5rem;
+    flex: unset;
+    min-width: 0;
+    width: 100%;
   }
 }
 
