@@ -23,6 +23,13 @@ describe('nameToKatakana', () => {
     expect(it.katakana).toBe('ラウラ');
   });
 
+  it('keeps EN Norma and IT Norma as separate validated readings', async () => {
+    const en = await nameToKatakana('Norma', 'en');
+    const it = await nameToKatakana('Norma', 'it');
+    expect(en.katakana).toBe('ノーマ');
+    expect(it.katakana).toBe('ノルマ');
+  });
+
   it('uses newly validated English entries from the production dictionary', async () => {
     const result = await nameToKatakana('Aaliyah', 'en');
     expect(result.tier).toBe('validated');
