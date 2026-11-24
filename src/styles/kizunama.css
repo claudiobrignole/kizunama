@@ -820,7 +820,7 @@
 }
 
 .kz-katakana-result {
-  margin-top: 0.85rem;
+  margin-top: 0;
   display: flex;
   align-items: center;
   gap: 0.7rem;
@@ -1226,6 +1226,7 @@
   transform: translateY(-50%);
   height: 3.12rem;
   width: auto;
+  aspect-ratio: 1024 / 477;
   display: block;
   z-index: 1;
 }
@@ -1242,6 +1243,7 @@
   bottom: 0;
   height: 5.35rem;
   width: auto;
+  aspect-ratio: 983 / 860;
   display: block;
   pointer-events: none;
   user-select: none;
@@ -1501,5 +1503,261 @@
   .kz-ateji-combo-chip:hover,
   .mg-btn:hover {
     transform: none;
+  }
+}
+
+/* Reserved result row: the katakana appears inside space that is already there. */
+.kz-result-slot {
+  min-height: 3.25rem;
+  margin-top: 0.85rem;
+}
+
+.kz-katakana-result--reserved {
+  min-height: 2.4rem;
+}
+
+.kz-share-name {
+  margin-top: 0.85rem;
+}
+
+.kz-share-name__btn {
+  max-width: 100%;
+  height: auto;
+  min-height: var(--btn-height);
+  white-space: normal;
+  text-align: center;
+  line-height: 1.25;
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+}
+
+.kz-share-name__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.kz-share-name__status {
+  min-height: 1.35rem;
+  margin: 0.4rem 0 0;
+  font-size: calc(0.82rem / var(--ln-body-text-scale));
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.kz-share-name__status a {
+  color: var(--ln-ink);
+  font-weight: 700;
+}
+
+a.kz-brand-lockup__name {
+  color: var(--ln-cream);
+  text-decoration: none;
+}
+
+a.kz-brand-lockup__name:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.kz-guide {
+  background: var(--ln-cream);
+  color: var(--ln-ink);
+  padding: 2.4rem var(--page-gutter) 2.8rem;
+}
+
+.kz-guide__inner,
+.kz-name-page__inner {
+  max-width: var(--kz-tool-max-width);
+  margin: 0 auto;
+}
+
+.kz-guide h2,
+.kz-name-page h1,
+.kz-name-page h2 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--ln-ink);
+}
+
+.kz-guide h2 {
+  font-size: clamp(1.3rem, 3vw, 1.65rem);
+  margin: 2rem 0 0.7rem;
+}
+
+.kz-guide h2:first-child {
+  margin-top: 0;
+}
+
+.kz-guide p,
+.kz-name-page p {
+  margin: 0 0 0.8rem;
+  line-height: 1.55;
+}
+
+.kz-name-table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 0.4rem 0 0.8rem;
+  border: 2px solid var(--ln-ink);
+  background: #fff;
+  box-shadow: 4px 4px 0 var(--ln-shadow);
+}
+
+.kz-name-table {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+  font-size: calc(0.92rem / var(--ln-body-text-scale));
+}
+
+.kz-name-table th,
+.kz-name-table td {
+  padding: 0.55rem 0.7rem;
+  text-align: left;
+  vertical-align: baseline;
+  border-bottom: 1px solid color-mix(in srgb, var(--ln-ink) 16%, transparent);
+}
+
+.kz-name-table th {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--ln-yellow);
+}
+
+.kz-name-table a,
+.kz-similar a,
+.kz-name-page__links a,
+.kz-guide__index a {
+  color: var(--ln-ink);
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.kz-name-table a:focus-visible,
+.kz-similar a:focus-visible,
+.kz-name-page__links a:focus-visible,
+.kz-guide a:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.kz-furigana {
+  font-family: var(--font-japanese);
+  font-weight: 700;
+  font-size: 2.35rem;
+  ruby-position: over;
+}
+
+.kz-furigana rt {
+  font-family: var(--font-body);
+  font-size: 0.38em;
+  font-weight: 650;
+}
+
+.kz-furigana--table {
+  font-size: 1.15rem;
+}
+
+.kz-faq__item {
+  padding: 0.85rem 0;
+  border-top: 2px solid var(--ln-ink);
+}
+
+.kz-faq__item h3 {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 750;
+  margin: 0 0 0.35rem;
+}
+
+.kz-name-page {
+  background: var(--ln-cream);
+  color: var(--ln-ink);
+  padding: 2rem var(--page-gutter) 3rem;
+}
+
+.kz-name-page h1 {
+  font-size: clamp(1.6rem, 4vw, 2.15rem);
+  margin: 0 0 0.75rem;
+}
+
+.kz-name-page h2 {
+  font-size: 1.2rem;
+  margin: 1.4rem 0 0.55rem;
+}
+
+.kz-name-result {
+  margin: 1rem 0 0.4rem;
+  padding: 0.9rem 1rem 0.3rem;
+  background: #fff;
+  border: 2px solid var(--ln-ink);
+  box-shadow: 4px 4px 0 var(--ln-shadow);
+}
+
+.kz-name-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.8rem;
+  margin: 0.8rem 0 0.7rem;
+}
+
+.kz-name-facts dt {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.kz-name-facts dd {
+  margin: 0;
+}
+
+.kz-similar {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.kz-similar li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.8rem;
+  align-items: baseline;
+}
+
+.kz-similar__romaji {
+  color: var(--text-muted);
+}
+
+.kz-name-page__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  margin-top: 1.4rem;
+}
+
+.kz-index-letter + .kz-index-letter {
+  margin-top: 1.1rem;
+}
+
+@media (max-width: 640px) {
+  .kz-name-page .kz-furigana {
+    font-size: 1.7rem;
+  }
+
+  .kz-name-facts {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+
+  .kz-name-facts div + div {
+    margin-top: 0.45rem;
   }
 }

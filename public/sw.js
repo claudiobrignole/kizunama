@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kizunama-v9';
+const CACHE_NAME = 'kizunama-v10';
 const CORE_ASSETS = [
   '/',
   '/en/',

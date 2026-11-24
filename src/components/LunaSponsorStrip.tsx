@@ -15,7 +15,9 @@ export function LunaSponsorStrip() {
           className="kz-luna-strip__logo"
           src="/brand/Luna-Nihongo-logo-orizz-bianco-rosso.png"
           alt="Luna Nihongo"
-          height={36}
+          width={1024}
+          height={477}
+          decoding="async"
         />
         <a
           className="mg-btn mg-btn--red kz-luna-strip__cta"

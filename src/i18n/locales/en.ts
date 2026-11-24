@@ -14,10 +14,12 @@ const en = {
     label: 'Language',
   },
   meta: {
-    title: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
-    description: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
-    ogTitle: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
-    ogDescription: 'キズナマ KIZUNAMA - Turn your name into a Japanese Katakana and Kanji name',
+    title: 'Katakana Name Converter – Your Name in Japanese (with Furigana)',
+    description:
+      'Type your name and see it written in Japanese katakana, with furigana and pronunciation. Free, instant, no sign-up.',
+    ogTitle: 'Katakana Name Converter – Your Name in Japanese (with Furigana)',
+    ogDescription:
+      'Type your name and see it written in Japanese katakana, with furigana and pronunciation. Free, instant, no sign-up.',
   },
   band1: {
     index: '01.SOUND',
@@ -218,7 +220,7 @@ const en = {
   },
   footer: {
     seo: 'キズナマ KIZUNAMA — Turn your name into a Japanese Katakana and Kanji name. Convert sound to Katakana, explore ateji Kanji, check seimei handan, make a Hanko, and share a social image (Story, Post, or Square). Free, no AI, no account. Kanji data from KANJIDIC2 and names from ENAMDICT/JMnedict (EDRDG licence).',
-    credits: 'Made by',
+    credits: 'Naito • Switzerland',
     sourcesTitle: 'Sources & licences',
     sourcesBody:
       'Kanji readings, stroke counts and meanings from KANJIDIC2, and conventional foreign-name spellings from ENAMDICT/JMnedict, courtesy of the Electronic Dictionary Research and Development Group (EDRDG), used under the EDRDG licence. The seimei handan fortune table and ateji boost/exclusion lists are original editorial curation by Kizunama.',
@@ -226,6 +228,69 @@ const en = {
   },
   generalDisclaimer:
     'Kizunama is a playful cultural tool, not legal or official guidance. Nothing generated here is koseki-registrable and the seal preview is not a jitsuin. For anything official — name registration, residency, or a real hanko — consult a Japanese municipal office or a licensed hanko shop.',
+  seo: {
+    h1: 'Convert your name to Japanese katakana',
+    katakanaTitle: 'What katakana is, and why foreign names use it',
+    katakanaBody: [
+      'Katakana (カタカナ) is one of the three scripts used to write Japanese. It is the one used for words borrowed from other languages and for foreign personal names. It does not translate the name: it writes how the name sounds, one mora at a time.',
+      'A Western name changes shape because Japanese has no “l” (it uses the r-column) and almost every syllable must end in a vowel. A name that already alternates consonant and vowel, such as Marco, becomes マルコ. A name that ends in a consonant, such as John, becomes ジョン.',
+    ],
+    furiganaTitle: 'What furigana is',
+    furiganaBody: [
+      'Furigana is the small reading written with a Japanese word so you can say it. Here it sits on the katakana and splits the name into beats: マルコ is ma-ru-ko, three even beats, without the stress Italian or English would put on the first syllable.',
+      'The romaji line is that same reading in Latin letters. A macron (the line over ā, ī, ū, ē, ō) means the vowel is held for an extra beat, the long mark ー in katakana.',
+    ],
+    tableTitle: 'Common names already converted',
+    tableIntro: 'These spellings come from the validated name list, not from a fresh guess. Open a name for the reading and a note on the sounds that changed.',
+    colName: 'Name',
+    colKatakana: 'Katakana',
+    colRomaji: 'Romaji',
+    colPronunciation: 'Pronunciation',
+    indexLink: 'All names, A to Z',
+    faqTitle: 'Questions about katakana names',
+    faq: [
+      {
+        q: 'Can I get a tattoo of my name in katakana?',
+        a: 'You can, but have someone who reads Japanese check the spelling before it is inked. Katakana writes the sound, not a meaning, and a missing long-vowel mark or a wrong small kana changes the name. Kizunama shows the conventional spelling and the pronunciation so you can compare them. It is not a tattoo studio.',
+      },
+      {
+        q: 'What is the difference between katakana and kanji?',
+        a: 'Katakana is a phonetic script: each character is a syllable, and foreign names are written with it. Kanji are characters that carry meaning. Kizunama can also suggest ateji, kanji picked only because they sound like your name, but that is a historical game, not the normal way a foreign name is written today.',
+      },
+      {
+        q: 'What is furigana?',
+        a: 'Furigana is the small kana reading attached to Japanese writing. On this site it shows how to pronounce the katakana, mora by mora (ma-ru-ko for マルコ). It is a pronunciation guide, not a second translation.',
+      },
+      {
+        q: 'Is this the official Japanese form of my name?',
+        a: 'It is the conventional sound spelling used in Japanese, the same idea as a passport transcription. It does not create a legal Japanese name, and it cannot be registered in a family register as if it were a kanji given name.',
+      },
+      {
+        q: 'Why did my name gain extra vowels?',
+        a: 'Japanese syllables are mostly a consonant plus a vowel. A cluster or a final consonant has nowhere to sit, so a vowel is inserted: Jack becomes ジャック (jakku). Names that already alternate consonant and vowel, such as Marco, usually stay the same length.',
+      },
+      {
+        q: 'Does this translate the meaning of my name?',
+        a: 'No. Marco does not become a Japanese word with a meaning. The katakana records the pronunciation. If a meaning appears next to a kanji suggestion, that meaning belongs to the character, not to your name.',
+      },
+    ],
+    shareName: 'Share your name in Japanese',
+    shareCopied: 'Link copied',
+    shareFailed: 'Could not copy the link',
+    nameH1: '{name} in Japanese katakana',
+    nameTitle: '{name} in Japanese katakana – {kana}',
+    nameDescription: '{name} is written {kana} ({romaji}) in Japanese katakana. Pronunciation: {pronunciation}. Free furigana reading.',
+    romajiLabel: 'Romaji',
+    pronunciationLabel: 'Pronunciation',
+    similarTitle: 'Similar names',
+    convertAnother: 'Convert another name',
+    indexH1: 'Names in Japanese katakana',
+    indexTitle: 'Names in Japanese katakana, A to Z',
+    indexDescription: 'Alphabetical list of common given names written in Japanese katakana, with romaji and the reading of each name.',
+    indexIntro: 'Each name below has its own page: the katakana, the furigana, and a note on the specific sound that had to change. Names without that note are not listed.',
+    notFoundTitle: 'This name has no page',
+    notFoundBody: 'Kizunama only publishes a page when the spelling is validated and there is something specific to say about the sound. Use the converter for any other name.',
+  },
 } satisfies Messages;
 
 export default en;

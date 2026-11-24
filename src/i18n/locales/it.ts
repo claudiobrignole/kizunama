@@ -14,12 +14,12 @@ const it = {
     label: 'Lingua',
   },
   meta: {
-    title: 'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
+    title: 'Traduttore nomi in giapponese – Il tuo nome in katakana',
     description:
-      'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
-    ogTitle: 'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
+      'Scrivi il tuo nome e vedilo in katakana giapponese, con furigana e pronuncia. Gratis, immediato, senza registrazione.',
+    ogTitle: 'Traduttore nomi in giapponese – Il tuo nome in katakana',
     ogDescription:
-      'キズナマ KIZUNAMA - Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji',
+      'Scrivi il tuo nome e vedilo in katakana giapponese, con furigana e pronuncia. Gratis, immediato, senza registrazione.',
   },
   band1: {
     index: '01.SUONO',
@@ -220,7 +220,7 @@ const it = {
   },
   footer: {
     seo: 'キズナマ KIZUNAMA — Trasforma il tuo nome in uno giapponese scritto in caratteri Katakana e Kanji. Converti il suono in Katakana, esplora Kanji ateji, consulta il seimei handan, crea un Hanko e condividi l’immagine sui social (Story, Post o Quadrato). Gratis, senza AI e senza account. Dati Kanji da KANJIDIC2 e nomi da ENAMDICT/JMnedict (licenza EDRDG).',
-    credits: 'Realizzato da',
+    credits: 'Naito • Switzerland',
     sourcesTitle: 'Fonti e licenze',
     sourcesBody:
       'Letture, numero di tratti e significati dei Kanji da KANJIDIC2 e grafie convenzionali dei nomi stranieri da ENAMDICT/JMnedict, per gentile concessione dell\'Electronic Dictionary Research and Development Group (EDRDG), usati secondo la licenza EDRDG. La tabella della fortuna del seimei handan e le liste di boost/esclusione degli ateji sono una curatela editoriale originale di Kizunama.',
@@ -228,6 +228,69 @@ const it = {
   },
   generalDisclaimer:
     'Kizunama è uno strumento culturale e giocoso, non una guida legale o ufficiale. Nulla di quanto generato qui è registrabile nel koseki e l\'anteprima del timbro non è un jitsuin. Per qualsiasi cosa ufficiale — registrazione del nome, residenza o un hanko reale — rivolgiti a un ufficio comunale giapponese o a un negozio di hanko autorizzato.',
+  seo: {
+    h1: 'Scrivi il tuo nome in giapponese',
+    katakanaTitle: 'Cos’è il katakana, e perché i nomi stranieri si scrivono così',
+    katakanaBody: [
+      'Il katakana (カタカナ) è uno dei tre sistemi con cui si scrive il giapponese. È quello usato per le parole prese da altre lingue e per i nomi di persona stranieri. Non traduce il nome: ne scrive il suono, un mora alla volta.',
+      'Un nome occidentale cambia forma perché in giapponese non esiste la “l” (si usa la colonna della r) e quasi ogni sillaba deve finire per vocale. Un nome che alterna già consonante e vocale, come Marco, diventa マルコ. Un nome che finisce per consonante, come John, diventa ジョン.',
+    ],
+    furiganaTitle: 'Cos’è il furigana',
+    furiganaBody: [
+      'Il furigana è la lettura in piccolo scritta accanto alla parola giapponese, per poterla dire. Qui sta sul katakana e divide il nome in battute: マルコ è ma-ru-ko, tre battute uguali, senza l’accento sulla prima sillaba che metterebbero l’italiano o l’inglese.',
+      'La riga in romaji è la stessa lettura in lettere latine. Un macron (il trattino su ā, ī, ū, ē, ō) vuol dire che la vocale si tiene per una battuta in più, il segno di vocale lunga ー nel katakana.',
+    ],
+    tableTitle: 'Nomi comuni già convertiti',
+    tableIntro: 'Queste grafie vengono dall’elenco validato, non da un tentativo nuovo. Apri un nome per la lettura e per una nota sui suoni che sono cambiati.',
+    colName: 'Nome',
+    colKatakana: 'Katakana',
+    colRomaji: 'Romaji',
+    colPronunciation: 'Pronuncia',
+    indexLink: 'Tutti i nomi, dalla A alla Z',
+    faqTitle: 'Domande sui nomi in katakana',
+    faq: [
+      {
+        q: 'Posso farmi un tatuaggio con il mio nome in katakana?',
+        a: 'Puoi, ma prima di inciderlo fallo leggere a qualcuno che conosce il giapponese. Il katakana registra il suono, non un significato: un trattino di vocale lunga mancante o un kana piccolo sbagliato cambiano il nome. Kizunama mostra la grafia convenzionale e la pronuncia perché tu possa confrontarle. Non è uno studio di tatuaggi.',
+      },
+      {
+        q: 'Qual è la differenza tra katakana e kanji?',
+        a: 'Il katakana è un sillabario: ogni segno è una sillaba, ed è così che si scrivono i nomi stranieri. I kanji sono caratteri che portano un significato. Kizunama può proporti anche degli ateji, kanji scelti solo perché suonano come il tuo nome, ma è un gioco storico, non il modo normale di scrivere oggi un nome straniero.',
+      },
+      {
+        q: 'Cos’è il furigana?',
+        a: 'Il furigana è la lettura in kana piccoli attaccata alla scrittura giapponese. Su questo sito mostra come pronunciare il katakana, mora per mora (ma-ru-ko per マルコ). È una guida alla pronuncia, non una seconda traduzione.',
+      },
+      {
+        q: 'Questa è la forma ufficiale giapponese del mio nome?',
+        a: 'È la trascrizione convenzionale del suono, la stessa idea di una trascrizione sul passaporto. Non crea un nome giapponese legale e non si registra nel koseki come se fosse un nome in kanji.',
+      },
+      {
+        q: 'Perché il mio nome ha guadagnato delle vocali?',
+        a: 'In giapponese la sillaba è quasi sempre consonante più vocale. Un gruppo di consonanti o una consonante finale non hanno dove appoggiarsi, quindi si inserisce una vocale: Jack diventa ジャック (jakku). I nomi che già alternano consonante e vocale, come Marco, di solito restano della stessa lunghezza.',
+      },
+      {
+        q: 'Il sito traduce il significato del nome?',
+        a: 'No. Marco non diventa una parola giapponese con un senso. Il katakana registra la pronuncia. Se accanto a un kanji compare un significato, quel significato è del carattere, non del tuo nome.',
+      },
+    ],
+    shareName: 'Condividi il tuo nome in giapponese',
+    shareCopied: 'Link copiato',
+    shareFailed: 'Non sono riuscito a copiare il link',
+    nameH1: '{name} in katakana',
+    nameTitle: '{name} in giapponese (katakana) – {kana}',
+    nameDescription: '{name} si scrive {kana} ({romaji}) in katakana. Pronuncia: {pronunciation}. Lettura furigana gratuita.',
+    romajiLabel: 'Romaji',
+    pronunciationLabel: 'Pronuncia',
+    similarTitle: 'Nomi simili',
+    convertAnother: 'Converti un altro nome',
+    indexH1: 'Nomi in katakana giapponese',
+    indexTitle: 'Nomi in katakana giapponese, dalla A alla Z',
+    indexDescription: 'Elenco alfabetico di nomi propri comuni scritti in katakana, con romaji e la lettura di ogni nome.',
+    indexIntro: 'Ogni nome qui sotto ha una pagina sua: il katakana, il furigana e una nota sul suono che è dovuto cambiare. I nomi senza quella nota non sono in elenco.',
+    notFoundTitle: 'Questo nome non ha una pagina',
+    notFoundBody: 'Kizunama pubblica una pagina solo quando la grafia è validata e c’è qualcosa di preciso da dire sul suono. Per qualsiasi altro nome usa il convertitore.',
+  },
 } satisfies Messages;
 
 export default it;

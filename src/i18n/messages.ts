@@ -184,6 +184,38 @@ export interface Messages {
     sponsorCta: string;
   };
   generalDisclaimer: string;
+  seo: {
+    h1: string;
+    katakanaTitle: string;
+    katakanaBody: string[];
+    furiganaTitle: string;
+    furiganaBody: string[];
+    tableTitle: string;
+    tableIntro: string;
+    colName: string;
+    colKatakana: string;
+    colRomaji: string;
+    colPronunciation: string;
+    indexLink: string;
+    faqTitle: string;
+    faq: { q: string; a: string }[];
+    shareName: string;
+    shareCopied: string;
+    shareFailed: string;
+    nameH1: string;
+    nameTitle: string;
+    nameDescription: string;
+    romajiLabel: string;
+    pronunciationLabel: string;
+    similarTitle: string;
+    convertAnother: string;
+    indexH1: string;
+    indexTitle: string;
+    indexDescription: string;
+    indexIntro: string;
+    notFoundTitle: string;
+    notFoundBody: string;
+  };
 }
 
 export type LocaleCode = 'en' | 'it';

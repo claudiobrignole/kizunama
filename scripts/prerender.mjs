@@ -1,7 +1,6 @@
 /**
- * Post-vite prerender: localize dist/index.html (Italian root) and
- * dist/en/index.html (English), inject crawler-visible body copy + JSON-LD,
- * plus sitemap.xml (with hreflang) and robots.txt.
+ * Post-vite prerender: localize home pages, write name and index HTML,
+ * Open Graph cards, sitemap.xml (with hreflang) and robots.txt.
  *
  * Requires Node 22+ (`--experimental-strip-types`) to import locale TS modules.
  */
@@ -10,38 +9,25 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { lunaNihongoUrl } from '../src/config.ts';
 import en from '../src/i18n/locales/en.ts';
 import it from '../src/i18n/locales/it.ts';
+import { absoluteUrl, homePath, hreflangSet, nameIndexPath, namePagePath } from '../src/seo/paths.ts';
+import { nameModels, renderHomeStatic, renderIndexStatic, renderNameStatic } from '../src/seo/staticHtml.ts';
+import { spellingFor } from '../src/seo/names.ts';
+import { readKatakana } from '../src/utils/katakanaReading.ts';
+import { OG_HEIGHT, OG_WIDTH, writeNameOg } from './nameOg.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 const SITE = 'https://kizunama.com';
-const OG_IMAGE = `${SITE}/brand/og-card.png`;
-const OG_WIDTH = '1200';
-const OG_HEIGHT = '630';
+const BRAND_OG = `${SITE}/brand/og-card.png`;
 const MIN_STATIC_TEXT_CHARS = 1000;
 
 const LOCALES = {
-  it: {
-    lang: 'it',
-    ogLocale: 'it_IT',
-    canonical: `${SITE}/`,
-    messages: it,
-  },
-  en: {
-    lang: 'en',
-    ogLocale: 'en_US',
-    canonical: `${SITE}/en/`,
-    messages: en,
-  },
+  it: { lang: 'it', ogLocale: 'it_IT', messages: it },
+  en: { lang: 'en', ogLocale: 'en_US', messages: en },
 };
-
-const HREFLANG = `
-    <link rel="alternate" hreflang="it" href="${SITE}/" />
-    <link rel="alternate" hreflang="en" href="${SITE}/en/" />
-    <link rel="alternate" hreflang="x-default" href="${SITE}/" />`.trim();
 
 function escapeAttr(value) {
   return value
@@ -51,23 +37,15 @@ function escapeAttr(value) {
     .replace(/>/g, '&gt;');
 }
 
-function escapeHtml(value) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function buildJsonLd(localeKey, meta) {
-  const { lang, canonical, messages } = meta;
+function homeJsonLd(localeKey, canonical) {
+  const { lang, messages } = LOCALES[localeKey];
   return {
     '@context': 'https://schema.org',
     '@graph': [
       {
         '@type': 'WebApplication',
         name: 'KIZUNAMA',
-        alternateName: '絆名',
+        alternateName: ['絆名', 'Katakana Name Converter'],
         url: canonical,
         applicationCategory: 'UtilitiesApplication',
         operatingSystem: 'Web',
@@ -86,106 +64,49 @@ function buildJsonLd(localeKey, meta) {
         name: 'Brignole',
         url: 'https://brignole.ch',
       },
+      {
+        '@type': 'FAQPage',
+        mainEntity: messages.seo.faq.map((item) => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: { '@type': 'Answer', text: item.a },
+        })),
+      },
     ],
   };
 }
 
-function buildStaticBody(messages) {
-  const lunaUrl = lunaNihongoUrl('seo');
-  const bands = [
-    { index: messages.band1.index, subtitle: messages.band1.subtitle },
-    { index: messages.band2.index, subtitle: messages.band2.subtitle },
-    { index: messages.band3.index, subtitle: messages.band3.subtitle },
-    { index: messages.band4.index, subtitle: messages.band4.subtitle },
-  ];
-
-  const howTitle = messages.header.helpButton;
-
-  return `
-    <div class="kz-landing kz-seo-static" data-seo-static="true">
-      <header class="ln-header">
-        <div class="ln-header-inner">
-          <div class="kz-header-main">
-            <div class="kz-brand-lockup">
-              <span class="kz-brand-lockup__name">
-                <span class="kz-brand-lockup__kanji" lang="ja">キズナマ</span>
-                KIZUNAMA
-              </span>
-            </div>
-            <p class="kz-header-tagline">${escapeHtml(messages.header.tagline)}</p>
-          </div>
-        </div>
-      </header>
-      <main class="kz-seo-static__main">
-        <h1 class="kz-seo-static__title">KIZUNAMA — ${escapeHtml(messages.header.tagline)}</h1>
-        <p class="kz-seo-static__lead">${escapeHtml(messages.footer.seo)}</p>
-        <section class="kz-seo-static__how" aria-labelledby="kz-seo-how">
-          <h2 id="kz-seo-how" class="kz-seo-static__how-title">${escapeHtml(howTitle)}</h2>
-          <ol class="kz-seo-static__bands">
-            ${bands
-              .map(
-                (b) => `
-              <li class="kz-seo-static__band">
-                <strong class="kz-seo-static__band-index">${escapeHtml(b.index)}</strong>
-                <span class="kz-seo-static__band-sub">${escapeHtml(b.subtitle)}</span>
-              </li>`,
-              )
-              .join('')}
-          </ol>
-        </section>
-        <aside class="kz-ateji-disclaimer" role="note">
-          ${escapeHtml(messages.atejiCandidates.disclaimer)}
-        </aside>
-        <p class="kz-seo-static__legal">${escapeHtml(messages.generalDisclaimer)}</p>
-      </main>
-      <footer class="kz-footer ln-footer">
-        <div class="kz-footer__inner">
-          <p class="kz-footer__sources">
-            <strong>${escapeHtml(messages.footer.sourcesTitle)}.</strong>
-            ${escapeHtml(messages.footer.sourcesBody)}
-          </p>
-          <p class="kz-footer__credits">
-            ${escapeHtml(messages.footer.credits)}
-            <a href="https://brignole.ch" rel="noopener noreferrer">brignole.ch</a>
-            ·
-            <a href="${escapeAttr(lunaUrl)}" rel="noopener noreferrer">${escapeHtml(messages.footer.sponsorCta)}</a>
-          </p>
-        </div>
-      </footer>
-    </div>`.trim();
+function hreflangTags(links) {
+  return links
+    .map((item) => `    <link rel="alternate" hreflang="${item.hreflang}" href="${escapeAttr(item.href)}" />`)
+    .join('\n');
 }
 
-function applyMeta(html, localeKey) {
-  const meta = LOCALES[localeKey];
-  const { messages, lang, canonical, ogLocale } = meta;
+function applyDocument(html, page) {
+  const { lang, title, description, canonical, ogLocale, ogImage, ogAlt, links, jsonLd } = page;
   let out = html;
 
   out = out.replace(/<html\s+lang="[^"]*"/i, `<html lang="${lang}"`);
-  if (!/<html\s+lang=/i.test(out)) {
-    out = out.replace(/<html/i, `<html lang="${lang}"`);
-  }
+  if (!/<html\s+lang=/i.test(out)) out = out.replace(/<html/i, `<html lang="${lang}"`);
 
-  out = out.replace(/<title>[^<]*<\/title>/i, `<title>${escapeAttr(messages.meta.title)}</title>`);
+  out = out.replace(/<title>[^<]*<\/title>/i, `<title>${escapeAttr(title)}</title>`);
 
   const ensureMeta = (pattern, tag) => {
-    if (pattern.test(out)) {
-      out = out.replace(pattern, tag);
-    } else {
-      out = out.replace(/<\/head>/i, `    ${tag}\n  </head>`);
-    }
+    if (pattern.test(out)) out = out.replace(pattern, tag);
+    else out = out.replace(/<\/head>/i, `    ${tag}\n  </head>`);
   };
 
   ensureMeta(
     /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
-    `<meta name="description" content="${escapeAttr(messages.meta.description)}" />`,
+    `<meta name="description" content="${escapeAttr(description)}" />`,
   );
   ensureMeta(
     /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i,
-    `<meta property="og:title" content="${escapeAttr(messages.meta.ogTitle)}" />`,
+    `<meta property="og:title" content="${escapeAttr(title)}" />`,
   );
   ensureMeta(
     /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i,
-    `<meta property="og:description" content="${escapeAttr(messages.meta.ogDescription)}" />`,
+    `<meta property="og:description" content="${escapeAttr(description)}" />`,
   );
   ensureMeta(
     /<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i,
@@ -193,17 +114,16 @@ function applyMeta(html, localeKey) {
   );
   ensureMeta(
     /<meta\s+property="og:locale"\s+content="[^"]*"\s*\/?>/i,
-    `<meta property="og:locale" content="${ogLocale}" />`,
+    `<meta property="og:locale" content="${escapeAttr(ogLocale)}" />`,
   );
-  // Point to the other locale (bilingual site).
-  const alternateOgLocale = localeKey === 'it' ? 'en_US' : 'it_IT';
+  const alternateLocale = ogLocale === 'it_IT' ? 'en_US' : 'it_IT';
   ensureMeta(
     /<meta\s+property="og:locale:alternate"\s+content="[^"]*"\s*\/?>/i,
-    `<meta property="og:locale:alternate" content="${alternateOgLocale}" />`,
+    `<meta property="og:locale:alternate" content="${alternateLocale}" />`,
   );
   ensureMeta(
     /<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i,
-    `<meta property="og:image" content="${escapeAttr(OG_IMAGE)}" />`,
+    `<meta property="og:image" content="${escapeAttr(ogImage)}" />`,
   );
   ensureMeta(
     /<meta\s+property="og:image:width"\s+content="[^"]*"\s*\/?>/i,
@@ -219,7 +139,7 @@ function applyMeta(html, localeKey) {
   );
   ensureMeta(
     /<meta\s+property="og:image:alt"\s+content="[^"]*"\s*\/?>/i,
-    `<meta property="og:image:alt" content="KIZUNAMA 絆名" />`,
+    `<meta property="og:image:alt" content="${escapeAttr(ogAlt)}" />`,
   );
   ensureMeta(
     /<meta\s+name="twitter:card"\s+content="[^"]*"\s*\/?>/i,
@@ -227,46 +147,41 @@ function applyMeta(html, localeKey) {
   );
   ensureMeta(
     /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i,
-    `<meta name="twitter:title" content="${escapeAttr(messages.meta.ogTitle)}" />`,
+    `<meta name="twitter:title" content="${escapeAttr(title)}" />`,
   );
   ensureMeta(
     /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i,
-    `<meta name="twitter:description" content="${escapeAttr(messages.meta.ogDescription)}" />`,
+    `<meta name="twitter:description" content="${escapeAttr(description)}" />`,
   );
   ensureMeta(
     /<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/i,
-    `<meta name="twitter:image" content="${escapeAttr(OG_IMAGE)}" />`,
+    `<meta name="twitter:image" content="${escapeAttr(ogImage)}" />`,
   );
 
-  // Drop previous canonical / hreflang / json-ld, then inject fresh set.
   out = out.replace(/\s*<link\s+rel="canonical"[^>]*>/gi, '');
   out = out.replace(/\s*<link\s+rel="alternate"\s+hreflang="[^"]*"[^>]*>/gi, '');
   out = out.replace(/\s*<script\s+type="application\/ld\+json">[\s\S]*?<\/script>/gi, '');
 
-  const jsonLd = JSON.stringify(buildJsonLd(localeKey, meta));
   const headExtras = `
-    <link rel="canonical" href="${canonical}" />
-    ${HREFLANG}
+    <link rel="canonical" href="${escapeAttr(canonical)}" />
+${hreflangTags(links)}
     <link rel="alternate" type="text/plain" title="LLM summary" href="${SITE}/llms.txt" />
-    <script type="application/ld+json">${jsonLd}</script>`;
+    ${jsonLd ? `<script type="application/ld+json">${jsonLd}</script>` : ''}`;
 
   out = out.replace(/<\/head>/i, `${headExtras}\n  </head>`);
 
-  const staticBody = buildStaticBody(messages);
   if (!/<div\s+id="root"[^>]*>\s*<\/div>/i.test(out)) {
     console.error('[prerender] expected empty <div id="root"></div> in Vite template');
     process.exit(1);
   }
-  out = out.replace(/<div\s+id="root"[^>]*>\s*<\/div>/i, `<div id="root">${staticBody}</div>`);
-
+  out = out.replace(/<div\s+id="root"[^>]*>\s*<\/div>/i, `<div id="root">${page.body}</div>`);
   return out;
 }
 
 function readableTextLength(html) {
-  const withoutScripts = html
+  const text = html
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ');
-  const text = withoutScripts
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&[a-z#0-9]+;/gi, ' ')
     .replace(/\s+/g, ' ')
@@ -274,78 +189,188 @@ function readableTextLength(html) {
   return text.length;
 }
 
-function assertStaticContent(filePath, localeKey) {
+function assertStatic(filePath, label, needles) {
   const html = fs.readFileSync(filePath, 'utf8');
   const len = readableTextLength(html);
-  if (len < MIN_STATIC_TEXT_CHARS) {
-    console.error(
-      `[prerender] ${localeKey}: readable text after stripping scripts is ${len} chars (need ≥ ${MIN_STATIC_TEXT_CHARS})`,
-    );
+  if (len < MIN_STATIC_TEXT_CHARS && label.startsWith('home')) {
+    console.error(`[prerender] ${label}: readable text is ${len} chars (need ≥ ${MIN_STATIC_TEXT_CHARS})`);
     process.exit(1);
   }
   if (!html.includes('data-seo-static="true"')) {
-    console.error(`[prerender] ${localeKey}: missing injected static body`);
+    console.error(`[prerender] ${label}: missing static body`);
     process.exit(1);
   }
-  console.log(`[prerender] ${localeKey}: static text ok (${len} chars)`);
+  if (!html.includes('rel="canonical" href="https://kizunama.com')) {
+    console.error(`[prerender] ${label}: canonical is not absolute`);
+    process.exit(1);
+  }
+  for (const needle of needles) {
+    if (!html.includes(needle)) {
+      console.error(`[prerender] ${label}: missing ${needle.slice(0, 80)}`);
+      process.exit(1);
+    }
+  }
+  return html;
 }
 
-function main() {
+function writePage(template, filePath, page) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, applyDocument(template, page));
+}
+
+function xhtmlLink(hreflang, href) {
+  return `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${href}" />`;
+}
+
+function sitemapUrl(loc, links) {
+  return `  <url>\n    <loc>${loc}</loc>\n${links.map((item) => xhtmlLink(item.hreflang, item.href)).join('\n')}\n  </url>`;
+}
+
+async function main() {
   const built = path.join(DIST, 'index.html');
   if (!fs.existsSync(built)) {
     console.error('[prerender] dist/index.html missing — run vite build first');
     process.exit(1);
   }
-
-  const ogCard = path.join(ROOT, 'public/brand/og-card.png');
-  if (!fs.existsSync(ogCard)) {
+  if (!fs.existsSync(path.join(ROOT, 'public/brand/og-card.png'))) {
     console.error('[prerender] public/brand/og-card.png missing — run npm run build:icons first');
     process.exit(1);
   }
 
   const template = fs.readFileSync(built, 'utf8');
+  const titles = new Set();
+  const sitemap = [];
 
-  const italianHtml = applyMeta(template, 'it');
-  fs.writeFileSync(built, italianHtml);
+  for (const localeKey of ['it', 'en']) {
+    const meta = LOCALES[localeKey];
+    const canonical = absoluteUrl(homePath(localeKey));
+    const body = renderHomeStatic(meta.messages, localeKey);
+    const filePath = localeKey === 'it' ? built : path.join(DIST, 'en/index.html');
+    writePage(template, filePath, {
+      lang: meta.lang,
+      title: meta.messages.meta.title,
+      description: meta.messages.meta.description,
+      canonical,
+      ogLocale: meta.ogLocale,
+      ogImage: BRAND_OG,
+      ogAlt: 'KIZUNAMA',
+      links: hreflangSet('home'),
+      jsonLd: JSON.stringify(homeJsonLd(localeKey, canonical)),
+      body,
+    });
+    assertStatic(filePath, `home-${localeKey}`, [
+      meta.messages.seo.h1,
+      'FAQPage',
+      '"@type":"WebApplication"',
+      '"price":"0"',
+      'hreflang="x-default" href="https://kizunama.com/en/"',
+    ]);
+    titles.add(meta.messages.meta.title);
+    sitemap.push(sitemapUrl(canonical, hreflangSet('home')));
+  }
 
-  const enDir = path.join(DIST, 'en');
-  fs.mkdirSync(enDir, { recursive: true });
-  const enPath = path.join(enDir, 'index.html');
-  fs.writeFileSync(enPath, applyMeta(template, 'en'));
+  for (const localeKey of ['it', 'en']) {
+    const meta = LOCALES[localeKey];
+    const canonical = absoluteUrl(nameIndexPath(localeKey));
+    const filePath = path.join(DIST, nameIndexPath(localeKey).replace(/^\//, ''), 'index.html');
+    writePage(template, filePath, {
+      lang: meta.lang,
+      title: meta.messages.seo.indexTitle,
+      description: meta.messages.seo.indexDescription,
+      canonical,
+      ogLocale: meta.ogLocale,
+      ogImage: BRAND_OG,
+      ogAlt: 'KIZUNAMA',
+      links: hreflangSet('index'),
+      jsonLd: '',
+      body: renderIndexStatic(meta.messages, localeKey),
+    });
+    assertStatic(filePath, `index-${localeKey}`, [meta.messages.seo.indexH1, 'hreflang="x-default" href="https://kizunama.com/en/names"']);
+    titles.add(meta.messages.seo.indexTitle);
+    sitemap.push(sitemapUrl(canonical, hreflangSet('index')));
+  }
 
-  const xhtmlLink = (hreflang, href) =>
-    `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${href}" />`;
+  let ogCount = 0;
+  for (const localeKey of ['it', 'en']) {
+    const meta = LOCALES[localeKey];
+    for (const model of nameModels(localeKey, meta.messages)) {
+      if (titles.has(model.title)) {
+        console.error(`[prerender] duplicate title: ${model.title}`);
+        process.exit(1);
+      }
+      titles.add(model.title);
+      if (model.note.trim().length < 80) {
+        console.error(`[prerender] thin note for ${model.entry.slug} (${localeKey})`);
+        process.exit(1);
+      }
 
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+      const kana = spellingFor(model.entry, localeKey);
+      const reading = readKatakana(kana);
+      const ogRel = `/og/names/${localeKey}/${model.entry.slug}.png`;
+      const ogFile = path.join(DIST, ogRel.slice(1));
+      await writeNameOg(ROOT, {
+        outFile: ogFile,
+        name: model.entry.name,
+        katakana: kana,
+        romaji: reading.romaji,
+      });
+      ogCount += 1;
+
+      const canonical = absoluteUrl(namePagePath(localeKey, model.entry.slug));
+      const filePath = path.join(DIST, namePagePath(localeKey, model.entry.slug).replace(/^\//, ''), 'index.html');
+      writePage(template, filePath, {
+        lang: meta.lang,
+        title: model.title,
+        description: model.description,
+        canonical,
+        ogLocale: meta.ogLocale,
+        ogImage: absoluteUrl(ogRel),
+        ogAlt: `${model.entry.name} ${kana}`,
+        links: hreflangSet('name', model.entry.slug),
+        jsonLd: '',
+        body: renderNameStatic(model, meta.messages, localeKey),
+      });
+      const html = assertStatic(filePath, `${localeKey}/${model.entry.slug}`, [
+        model.h1,
+        kana,
+        model.note.slice(0, 40),
+        `hreflang="x-default" href="${absoluteUrl(namePagePath('en', model.entry.slug))}"`,
+        absoluteUrl(ogRel),
+      ]);
+      if (readableTextLength(html) < 250) {
+        console.error(`[prerender] ${localeKey}/${model.entry.slug} is too short to publish`);
+        process.exit(1);
+      }
+      sitemap.push(sitemapUrl(canonical, hreflangSet('name', model.entry.slug)));
+    }
+  }
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url>
-    <loc>${SITE}/</loc>
-${xhtmlLink('it', `${SITE}/`)}
-${xhtmlLink('en', `${SITE}/en/`)}
-${xhtmlLink('x-default', `${SITE}/`)}
-  </url>
-  <url>
-    <loc>${SITE}/en/</loc>
-${xhtmlLink('it', `${SITE}/`)}
-${xhtmlLink('en', `${SITE}/en/`)}
-${xhtmlLink('x-default', `${SITE}/`)}
-  </url>
+${sitemap.join('\n')}
 </urlset>
 `;
-  fs.writeFileSync(path.join(DIST, 'sitemap.xml'), sitemap);
-
-  const robots = `User-agent: *
+  fs.writeFileSync(path.join(DIST, 'sitemap.xml'), xml);
+  fs.writeFileSync(
+    path.join(DIST, 'robots.txt'),
+    `User-agent: *
 Allow: /
 
 Sitemap: ${SITE}/sitemap.xml
-`;
-  fs.writeFileSync(path.join(DIST, 'robots.txt'), robots);
+`,
+  );
 
-  assertStaticContent(built, 'it');
-  assertStaticContent(enPath, 'en');
-
-  console.log('[prerender] wrote dist/index.html (it), dist/en/index.html (en), sitemap.xml, robots.txt');
+  const sitemapText = fs.readFileSync(path.join(DIST, 'sitemap.xml'), 'utf8');
+  const urlCount = (sitemapText.match(/<loc>/g) ?? []).length;
+  if (urlCount !== sitemap.length) {
+    console.error('[prerender] sitemap count mismatch');
+    process.exit(1);
+  }
+  console.log(`[prerender] ${urlCount} sitemap URLs, ${ogCount} name cards`);
 }
 
-main();
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

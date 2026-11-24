@@ -23,9 +23,9 @@ export function SiteFooter({ onOpenHelp }: SiteFooterProps) {
           <strong>{messages.footer.sourcesTitle}.</strong> {messages.footer.sourcesBody}
         </p>
         <p className="kz-footer__credits">
-          © {new Date().getFullYear()} Kizunama · {messages.footer.credits}{' '}
-          <a href="https://brignole.ch" target="_blank" rel="noopener noreferrer">
-            brignole.ch
+          © {new Date().getFullYear()} Kizunama ·{' '}
+          <a href="https://naito.work" target="_blank" rel="noopener noreferrer">
+            {messages.footer.credits}
           </a>
         </p>
       </div>

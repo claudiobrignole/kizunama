@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { LocaleCode, Messages } from './messages';
 import { localeFromPathname } from './messages';
+import { pathForLocaleSwitch, parseAppRoute } from '../seo/paths';
 import en from './locales/en';
 import it from './locales/it';
 import { setStoredLocale } from './storage';
@@ -37,8 +38,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const navigateToLocale = useCallback((next: LocaleCode) => {
     setStoredLocale(next);
-    const target = next === 'en' ? '/en/' : '/';
-    const search = window.location.search;
+    const route = parseAppRoute(window.location.pathname);
+    const target = pathForLocaleSwitch(window.location.pathname, next);
+    const search = route.kind === 'home' ? window.location.search : '';
     window.location.assign(search ? `${target}${search}` : target);
   }, []);
 

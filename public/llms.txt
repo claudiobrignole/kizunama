@@ -6,8 +6,11 @@ and a decorative Hanko seal preview. No account, no AI generation of names.
 
 ## Locales
 
-- Italian (default): https://kizunama.com/
-- English: https://kizunama.com/en/
+- Italian (home): https://kizunama.com/
+- English (home, x-default): https://kizunama.com/en/
+- Italian name pages: https://kizunama.com/it/nome/{name}
+- English name pages: https://kizunama.com/en/name/{name}
+- Indexes: https://kizunama.com/it/nomi and https://kizunama.com/en/names
 
 ## What it is not
 

@@ -1,0 +1,10 @@
+Options -Indexes
+DirectorySlash Off
+RewriteEngine On
+
+# Name pages and indexes are real files. Serve them without a trailing-slash redirect
+# so the canonical URL can stay slashless (/en/name/marco, /it/nome/marco).
+RewriteRule ^en/name/([a-z]+)/?$ /en/name/$1/index.html [L]
+RewriteRule ^en/names/?$ /en/names/index.html [L]
+RewriteRule ^it/nome/([a-z]+)/?$ /it/nome/$1/index.html [L]
+RewriteRule ^it/nomi/?$ /it/nomi/index.html [L]

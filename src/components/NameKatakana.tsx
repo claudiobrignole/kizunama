@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { nameToKatakana, type KatakanaLanguage, type KatakanaResult } from '../utils/katakana';
 import { PHONETIC_LANGUAGES } from '../utils/languagePhonetics';
 import { useI18n } from '../i18n/context';
@@ -15,6 +15,7 @@ interface NameKatakanaProps {
    * (no second selector — given + surname share one phonetic engine). */
   variant?: 'given' | 'surname';
   showCredibility?: boolean;
+  children?: ReactNode;
 }
 
 export function NameKatakana({
@@ -26,6 +27,7 @@ export function NameKatakana({
   onResult,
   variant = 'given',
   showCredibility = true,
+  children,
 }: NameKatakanaProps) {
   const { messages } = useI18n();
   const isGiven = variant === 'given';
@@ -96,23 +98,31 @@ export function NameKatakana({
           {loading ? t.converting : t.convert}
         </button>
       </div>
-      {loading && <p className="kz-loading-note">{t.loading}</p>}
-      {result && result.katakana && (
-        <div className="kz-katakana-result">
-          <span className="kz-katakana-result__text" lang="ja">
-            {result.katakana}
-          </span>
-          <button type="button" className="kz-copy-btn" onClick={() => void handleCopy()}>
-            {copied ? t.copied : t.copy}
-          </button>
-          {showCredibility && <CredibilityBadge tier={result.tier} />}
-        </div>
-      )}
-      {result?.katakana && result.tier === 'approximate' && (
-        <p className="kz-transliteration-warning" role="alert">
-          {messages.transliteration.approximateWarning}
-        </p>
-      )}
+      <div className="kz-result-slot">
+        {loading ? (
+          <p className="kz-loading-note">{t.loading}</p>
+        ) : result?.katakana ? (
+          <>
+            <div className="kz-katakana-result">
+              <span className="kz-katakana-result__text" lang="ja">
+                {result.katakana}
+              </span>
+              <button type="button" className="kz-copy-btn" onClick={() => void handleCopy()}>
+                {copied ? t.copied : t.copy}
+              </button>
+              {showCredibility && <CredibilityBadge tier={result.tier} />}
+            </div>
+            {result.tier === 'approximate' && (
+              <p className="kz-transliteration-warning" role="alert">
+                {messages.transliteration.approximateWarning}
+              </p>
+            )}
+          </>
+        ) : (
+          <div className="kz-katakana-result kz-katakana-result--reserved" aria-hidden="true" />
+        )}
+      </div>
+      {children}
     </div>
   );
 }

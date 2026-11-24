@@ -5,12 +5,17 @@ import { SeimeiHandanView } from './components/SeimeiHandanView';
 import { OrderHelper } from './components/OrderHelper';
 import { ShareDialog } from './components/ShareDialog';
 import { SiteFooter } from './components/SiteFooter';
+import { SiteHeader } from './components/SiteHeader';
 import { LunaSponsorStrip } from './components/LunaSponsorStrip';
 import { InstallPrompt } from './components/InstallPrompt';
-import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { LanguageBanner } from './components/LanguageBanner';
 import { HelpDialog, type HelpTopic } from './components/HelpDialog';
+import { SeoGuide } from './components/SeoGuide';
+import { ShareNameLink } from './components/ShareNameLink';
+import { NameIndex, NamePage } from './components/NamePage';
 import { useI18n } from './i18n/context';
+import { absoluteUrl, homePath, hreflangSet, parseAppRoute } from './seo/paths';
+import { usePageMeta } from './seo/usePageMeta';
 import {
   applyAtejiOverrides,
   generateAtejiCandidates,
@@ -46,9 +51,17 @@ function scheduleIdle(cb: () => void): () => void {
   return () => clearTimeout(id);
 }
 
-function App() {
+function Home({ onHelp }: { onHelp: (topic: HelpTopic) => void }) {
   const { messages, locale } = useI18n();
-  const [helpTopic, setHelpTopic] = useState<HelpTopic | null>(null);
+  usePageMeta({
+    title: messages.meta.title,
+    description: messages.meta.description,
+    canonical: absoluteUrl(homePath(locale)),
+    ogImage: 'https://kizunama.com/brand/og-card.png',
+    ogAlt: 'KIZUNAMA',
+    ogLocale: locale === 'it' ? 'it_IT' : 'en_US',
+    hreflang: hreflangSet('home'),
+  });
   const [lang, setLang] = useState<KatakanaLanguage>(locale);
   const initialNames = useRef(
     parseNameQuery(typeof window === 'undefined' ? '' : window.location.search),
@@ -218,42 +231,22 @@ function App() {
   const canShare = hankoChars.length > 0;
 
   return (
-    <div className="mg-landing kz-landing">
-      <LanguageBanner />
-
-      <header className="ln-header">
-        <div className="ln-header-inner">
-          <div className="kz-header-main">
-            <div className="kz-brand-lockup">
-              <span className="kz-brand-lockup__name">
-                <span className="kz-brand-lockup__kanji" lang="ja">
-                  キズナマ
-                </span>{' '}
-                KIZUNAMA
-              </span>
-            </div>
-            <p className="kz-header-tagline">{messages.header.tagline}</p>
-          </div>
-          <div className="kz-header-actions">
-            <LanguageSwitcher variant="header" />
-            <button type="button" className="mg-btn kz-help-btn" onClick={() => setHelpTopic('overview')}>
-              {messages.header.helpButton}
-            </button>
-          </div>
-        </div>
-      </header>
-
+    <>
       <section className="mg-band mg-band--yellow kz-band" aria-labelledby="band1-title">
         <div className="mg-band-inner">
           <div className="mg-band-copy">
-            <span className="mg-index">{messages.band1.index}</span>
-            <h1 className="mg-band-title" id="band1-title" lang="ja">
-              音写
+            <span className="mg-index">
+              {messages.band1.index}
+              {' · '}
+              <span lang="ja">音写</span>
+            </span>
+            <h1 className="mg-band-title" id="band1-title">
+              {messages.seo.h1}
               <button
                 type="button"
                 className="kz-help-icon"
                 aria-label={messages.band1.helpAria}
-                onClick={() => setHelpTopic('katakana')}
+                onClick={() => onHelp('katakana')}
               >
                 ?
               </button>
@@ -268,7 +261,9 @@ function App() {
               result={givenResult}
               onResult={handleGivenResult}
               variant="given"
-            />
+            >
+              <ShareNameLink name={givenName} enabled={Boolean(givenResult?.katakana)} />
+            </NameKatakana>
 
             <div className="kz-surname-block">
               <span className="mg-index">{messages.surnameField.label}</span>
@@ -287,6 +282,8 @@ function App() {
         </div>
       </section>
 
+      <SeoGuide />
+
       <section className="mg-band mg-band--washi kz-band" aria-labelledby="band2-title">
         <div className="mg-band-inner">
           <div className="mg-band-copy">
@@ -297,7 +294,7 @@ function App() {
                 type="button"
                 className="kz-help-icon"
                 aria-label={messages.band2.helpAria}
-                onClick={() => setHelpTopic('ateji')}
+                onClick={() => onHelp('ateji')}
               >
                 ?
               </button>
@@ -358,7 +355,7 @@ function App() {
                 type="button"
                 className="kz-help-icon"
                 aria-label={messages.band3.helpAria}
-                onClick={() => setHelpTopic('seimeiHandan')}
+                onClick={() => onHelp('seimeiHandan')}
               >
                 ?
               </button>
@@ -386,7 +383,7 @@ function App() {
                 type="button"
                 className="kz-help-icon"
                 aria-label={messages.band4.helpAria}
-                onClick={() => setHelpTopic('hanko')}
+                onClick={() => onHelp('hanko')}
               >
                 ?
               </button>
@@ -419,9 +416,6 @@ function App() {
 
       <LunaSponsorStrip />
 
-      <SiteFooter onOpenHelp={() => setHelpTopic('overview')} />
-      <InstallPrompt />
-      <HelpDialog topic={helpTopic} onClose={() => setHelpTopic(null)} />
       <ShareDialog
         open={shareOpen}
         onClose={() => setShareOpen(false)}
@@ -433,6 +427,26 @@ function App() {
         hankoChars={hankoChars}
         hankoOrientation={hankoOrientation}
       />
+    </>
+  );
+}
+
+function App() {
+  const route = parseAppRoute(typeof window === 'undefined' ? '/' : window.location.pathname);
+  const [helpTopic, setHelpTopic] = useState<HelpTopic | null>(null);
+
+  return (
+    <div className="mg-landing kz-landing">
+      <LanguageBanner />
+      <SiteHeader onHelp={() => setHelpTopic('overview')} />
+      {route.kind === 'home' && <Home onHelp={setHelpTopic} />}
+      {route.kind === 'index' && <NameIndex />}
+      {(route.kind === 'name' || route.kind === 'notfound') && (
+        <NamePage slug={route.kind === 'name' ? route.slug : ''} />
+      )}
+      {route.kind === 'home' && <InstallPrompt />}
+      <SiteFooter onOpenHelp={() => setHelpTopic('overview')} />
+      <HelpDialog topic={helpTopic} onClose={() => setHelpTopic(null)} />
     </div>
   );
 }
