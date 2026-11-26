@@ -282,8 +282,6 @@ function Home({ onHelp }: { onHelp: (topic: HelpTopic) => void }) {
         </div>
       </section>
 
-      <SeoGuide />
-
       <section className="mg-band mg-band--washi kz-band" aria-labelledby="band2-title">
         <div className="mg-band-inner">
           <div className="mg-band-copy">
@@ -415,6 +413,8 @@ function Home({ onHelp }: { onHelp: (topic: HelpTopic) => void }) {
       </section>
 
       <LunaSponsorStrip />
+
+      <SeoGuide />
 
       <ShareDialog
         open={shareOpen}
